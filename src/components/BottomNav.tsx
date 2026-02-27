@@ -1,0 +1,49 @@
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Home, Ticket, PlusCircle, MapPin, User } from 'lucide-react';
+
+interface BottomNavProps {
+  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile';
+  isDriver?: boolean;
+}
+
+const BottomNav = ({ active, isDriver = false }: BottomNavProps) => {
+  const navigate = useNavigate();
+
+  const passengerItems = [
+    { id: 'home' as const, label: 'Início', icon: Home, path: '/home' },
+    { id: 'bookings' as const, label: 'Reservas', icon: Ticket, path: '/my-bookings' },
+    { id: 'profile' as const, label: 'Perfil', icon: User, path: '/home' },
+  ];
+
+  const driverItems = [
+    { id: 'trips' as const, label: 'Viagens', icon: MapPin, path: '/my-trips' },
+    { id: 'create' as const, label: 'Criar', icon: PlusCircle, path: '/create-trip' },
+    { id: 'profile' as const, label: 'Perfil', icon: User, path: '/my-trips' },
+  ];
+
+  const items = isDriver ? driverItems : passengerItems;
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
+        {items.map((item) => {
+          const isActive = active === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.path)}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              <item.icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+              <span className="text-[10px] font-medium">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default BottomNav;
