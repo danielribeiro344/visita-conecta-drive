@@ -8,6 +8,9 @@ export const mockUser: User = {
   cpf: '123.456.789-00',
   status: 'Ativo',
   perfis: ['PASSAGEIRO'],
+  cidade: 'São Paulo',
+  totalViagens: 5,
+  avaliacaoMedia: 4.7,
 };
 
 export const mockDriver: User = {
@@ -18,6 +21,9 @@ export const mockDriver: User = {
   cpf: '987.654.321-00',
   status: 'Ativo',
   perfis: ['MOTORISTA'],
+  cidade: 'São Paulo',
+  totalViagens: 32,
+  avaliacaoMedia: 4.9,
 };
 
 export const mockDriverDetail: DriverDetail = {
@@ -128,6 +134,9 @@ export const mockBookings: Booking[] = [
     id: 'b1',
     viagemId: 't1',
     passageiroId: 'u1',
+    passageiroNome: 'Maria Silva',
+    passageiroTelefone: '(11) 99999-0000',
+    passageiroCidade: 'São Paulo',
     status: 'Confirmada',
     quantidadeVagas: 2,
     dataReserva: '2026-02-25',
@@ -137,9 +146,91 @@ export const mockBookings: Booking[] = [
     id: 'b2',
     viagemId: 't4',
     passageiroId: 'u1',
+    passageiroNome: 'Maria Silva',
+    passageiroTelefone: '(11) 99999-0000',
+    passageiroCidade: 'São Paulo',
     status: 'Confirmada',
     quantidadeVagas: 1,
     dataReserva: '2026-02-20',
     trip: mockTrips[3],
+  },
+  {
+    id: 'b3',
+    viagemId: 't1',
+    passageiroId: 'u4',
+    passageiroNome: 'Ana Oliveira',
+    passageiroTelefone: '(11) 97777-0000',
+    passageiroCidade: 'Guarulhos',
+    status: 'Pendente',
+    quantidadeVagas: 1,
+    dataReserva: '2026-02-27',
+    trip: mockTrips[0],
+  },
+  {
+    id: 'b4',
+    viagemId: 't1',
+    passageiroId: 'u5',
+    passageiroNome: 'João Pereira',
+    passageiroTelefone: '(11) 96666-0000',
+    passageiroCidade: 'Osasco',
+    status: 'Pendente',
+    quantidadeVagas: 2,
+    dataReserva: '2026-02-27',
+    trip: mockTrips[0],
+  },
+];
+
+export interface Notification {
+  id: string;
+  tipo: 'reserva_nova' | 'reserva_aprovada' | 'reserva_recusada' | 'viagem_cancelada' | 'cancelamento_passageiro';
+  titulo: string;
+  mensagem: string;
+  data: string;
+  lida: boolean;
+}
+
+export const mockNotificationsPassenger: Notification[] = [
+  {
+    id: 'n1',
+    tipo: 'reserva_aprovada',
+    titulo: 'Reserva aprovada!',
+    mensagem: 'Sua reserva para Penitenciária de Tremembé em 08/03 foi aprovada pelo motorista Carlos Santos.',
+    data: '2026-02-26T14:30:00',
+    lida: false,
+  },
+  {
+    id: 'n2',
+    tipo: 'reserva_recusada',
+    titulo: 'Reserva recusada',
+    mensagem: 'Sua reserva para CDP de Guarulhos em 06/03 foi recusada pelo motorista.',
+    data: '2026-02-25T10:00:00',
+    lida: true,
+  },
+];
+
+export const mockNotificationsDriver: Notification[] = [
+  {
+    id: 'n3',
+    tipo: 'reserva_nova',
+    titulo: 'Nova solicitação de reserva',
+    mensagem: 'Ana Oliveira solicitou 1 vaga para a viagem de 08/03 (Tremembé).',
+    data: '2026-02-27T09:00:00',
+    lida: false,
+  },
+  {
+    id: 'n4',
+    tipo: 'reserva_nova',
+    titulo: 'Nova solicitação de reserva',
+    mensagem: 'João Pereira solicitou 2 vagas para a viagem de 08/03 (Tremembé).',
+    data: '2026-02-27T08:15:00',
+    lida: false,
+  },
+  {
+    id: 'n5',
+    tipo: 'cancelamento_passageiro',
+    titulo: 'Cancelamento de passageiro',
+    mensagem: 'Roberto Lima cancelou a reserva para a viagem de 01/03.',
+    data: '2026-02-24T16:00:00',
+    lida: true,
   },
 ];
