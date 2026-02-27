@@ -17,7 +17,7 @@ const Register = () => {
       setStep('driver');
       return;
     }
-    navigate('/home');
+    navigate(selectedRole === 'MOTORISTA' ? '/my-trips' : '/home');
   };
 
   return (
