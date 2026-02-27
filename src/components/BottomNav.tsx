@@ -1,8 +1,8 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Ticket, PlusCircle, MapPin, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Home, Ticket, PlusCircle, MapPin, User, Bell, Inbox } from 'lucide-react';
 
 interface BottomNavProps {
-  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile';
+  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile' | 'notifications' | 'requests';
   isDriver?: boolean;
 }
 
@@ -12,13 +12,16 @@ const BottomNav = ({ active, isDriver = false }: BottomNavProps) => {
   const passengerItems = [
     { id: 'home' as const, label: 'Início', icon: Home, path: '/home' },
     { id: 'bookings' as const, label: 'Reservas', icon: Ticket, path: '/my-bookings' },
-    { id: 'profile' as const, label: 'Perfil', icon: User, path: '/home' },
+    { id: 'notifications' as const, label: 'Avisos', icon: Bell, path: '/notifications?role=passageiro' },
+    { id: 'profile' as const, label: 'Perfil', icon: User, path: '/profile?role=passageiro' },
   ];
 
   const driverItems = [
     { id: 'trips' as const, label: 'Viagens', icon: MapPin, path: '/my-trips' },
     { id: 'create' as const, label: 'Criar', icon: PlusCircle, path: '/create-trip' },
-    { id: 'profile' as const, label: 'Perfil', icon: User, path: '/my-trips' },
+    { id: 'requests' as const, label: 'Pedidos', icon: Inbox, path: '/driver-requests' },
+    { id: 'notifications' as const, label: 'Avisos', icon: Bell, path: '/notifications?role=motorista' },
+    { id: 'profile' as const, label: 'Perfil', icon: User, path: '/profile?role=motorista' },
   ];
 
   const items = isDriver ? driverItems : passengerItems;
@@ -32,7 +35,7 @@ const BottomNav = ({ active, isDriver = false }: BottomNavProps) => {
             <button
               key={item.id}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+              className={`flex flex-col items-center gap-1 px-3 py-2 transition-colors ${
                 isActive ? 'text-primary' : 'text-muted-foreground'
               }`}
             >

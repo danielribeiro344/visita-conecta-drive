@@ -13,6 +13,9 @@ export interface User {
   status: UserStatus;
   perfis: UserRole[];
   avatarUrl?: string;
+  cidade?: string;
+  totalViagens?: number;
+  avaliacaoMedia?: number;
 }
 
 export interface DriverDetail {
@@ -55,6 +58,9 @@ export interface Booking {
   id: string;
   viagemId: string;
   passageiroId: string;
+  passageiroNome?: string;
+  passageiroTelefone?: string;
+  passageiroCidade?: string;
   status: BookingStatus;
   quantidadeVagas: number;
   dataReserva: string;

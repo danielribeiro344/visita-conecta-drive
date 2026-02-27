@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -10,8 +10,13 @@ import PassengerHome from "./pages/PassengerHome";
 import PrisonDetail from "./pages/PrisonDetail";
 import BookTrip from "./pages/BookTrip";
 import MyBookings from "./pages/MyBookings";
+import BookingDetail from "./pages/BookingDetail";
 import CreateTrip from "./pages/CreateTrip";
 import MyTrips from "./pages/MyTrips";
+import DriverRequests from "./pages/DriverRequests";
+import DriverRequestDetail from "./pages/DriverRequestDetail";
+import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,8 +36,13 @@ const App = () => (
             <Route path="/prison/:id" element={<PrisonDetail />} />
             <Route path="/book/:id" element={<BookTrip />} />
             <Route path="/my-bookings" element={<MyBookings />} />
+            <Route path="/booking/:id" element={<BookingDetail />} />
             <Route path="/create-trip" element={<CreateTrip />} />
             <Route path="/my-trips" element={<MyTrips />} />
+            <Route path="/driver-requests" element={<DriverRequests />} />
+            <Route path="/driver-request/:id" element={<DriverRequestDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

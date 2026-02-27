@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, Users, ChevronRight } from 'lucide-react';
 import { mockBookings } from '@/data/mockData';
 import { BookingStatus } from '@/types';
 import BottomNav from '@/components/BottomNav';
@@ -13,6 +13,7 @@ const statusColors: Record<BookingStatus, string> = {
 
 const MyBookings = () => {
   const navigate = useNavigate();
+  const passengerBookings = mockBookings.filter(b => b.passageiroId === 'u1');
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -20,13 +21,14 @@ const MyBookings = () => {
         <h1 className="text-xl font-bold text-foreground mb-6">Minhas Reservas</h1>
 
         <div className="space-y-3">
-          {mockBookings.map((booking, i) => (
-            <motion.div
+          {passengerBookings.map((booking, i) => (
+            <motion.button
               key={booking.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-card rounded-2xl p-4 shadow-card"
+              onClick={() => navigate(`/booking/${booking.id}`)}
+              className="w-full text-left bg-card rounded-2xl p-4 shadow-card"
             >
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-semibold text-foreground">{booking.trip?.presidioNome}</p>
@@ -48,11 +50,14 @@ const MyBookings = () => {
                 <p className="text-xs text-muted-foreground">
                   Motorista: {booking.trip?.motoristaNome}
                 </p>
-                <p className="text-sm font-bold text-primary">
-                  R$ {booking.trip ? (booking.trip.valor * booking.quantidadeVagas).toFixed(2) : '0.00'}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-bold text-primary">
+                    R$ {booking.trip ? (booking.trip.valor * booking.quantidadeVagas).toFixed(2) : '0.00'}
+                  </p>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </div>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </div>
