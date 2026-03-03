@@ -24,6 +24,7 @@ export interface DriverDetail {
   cnhValidade: string;
   veiculoModelo: string;
   veiculoPlaca: string;
+  capacidadeVeiculo: number;
   aprovado: boolean;
 }
 
@@ -65,4 +66,14 @@ export interface Booking {
   quantidadeVagas: number;
   dataReserva: string;
   trip?: Trip;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderNome: string;
+  receiverId: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
 }

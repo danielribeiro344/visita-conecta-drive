@@ -9,24 +9,20 @@ import BottomNav from '@/components/BottomNav';
 const PassengerHome = () => {
   const navigate = useNavigate();
   const [selectedPrison, setSelectedPrison] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
 
   const activeTrips = mockTrips.filter(t => t.status === 'Ativa' || t.status === 'Lotada');
-
   const filteredTrips = selectedPrison
     ? activeTrips.filter(t => t.presidioId === selectedPrison)
     : activeTrips;
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <div className="gradient-hero px-6 pt-12 pb-8 rounded-b-3xl">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-primary-foreground/60 text-sm mb-1">Olá, Maria 👋</p>
-          <h1 className="text-xl font-bold text-primary-foreground">Encontre sua viagem</h1>
+          <h1 className="text-xl font-bold text-primary-foreground">Encontre sua carona</h1>
         </motion.div>
 
-        {/* Search card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,7 +45,6 @@ const PassengerHome = () => {
         </motion.div>
       </div>
 
-      {/* Quick access to prisons */}
       <div className="px-6 mt-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold text-foreground">Presídios</h2>
@@ -72,9 +67,8 @@ const PassengerHome = () => {
         </div>
       </div>
 
-      {/* Trips */}
       <div className="px-6 mt-6">
-        <h2 className="text-base font-semibold text-foreground mb-3">Viagens disponíveis</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">Caronas disponíveis</h2>
         <div className="space-y-3">
           {filteredTrips.map((trip, i) => (
             <TripCard key={trip.id} trip={trip} index={i} onClick={() => navigate(`/book/${trip.id}`)} />
@@ -82,7 +76,7 @@ const PassengerHome = () => {
           {filteredTrips.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
               <Search className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">Nenhuma viagem encontrada</p>
+              <p className="text-sm">Nenhuma carona encontrada</p>
             </div>
           )}
         </div>

@@ -23,12 +23,7 @@ const BookingDetail = () => {
 
   const trip = booking.trip;
   const total = trip.valor * booking.quantidadeVagas;
-  const driverPhone = mockDriver.telefone.replace(/\D/g, '');
   const maskedPlaca = mockDriverDetail.veiculoPlaca.replace(/(.{3}).(.*)/, '$1-****');
-
-  const whatsappUrl = `https://wa.me/55${driverPhone}?text=${encodeURIComponent(
-    `Olá, sou passageiro(a) da viagem para o presídio ${trip.presidioNome} no dia ${new Date(trip.dataSaida).toLocaleDateString('pt-BR')}. Gostaria de confirmar os detalhes.`
-  )}`;
 
   const handleCancel = () => {
     setStatus('Cancelada');
@@ -38,7 +33,7 @@ const BookingDetail = () => {
   const timelineSteps = [
     { label: 'Reserva solicitada', done: true, icon: Clock },
     { label: 'Reserva aprovada', done: status === 'Confirmada', icon: Check },
-    { label: 'Viagem realizada', done: trip.status === 'Finalizada', icon: Flag },
+    { label: 'Carona realizada', done: trip.status === 'Finalizada', icon: Flag },
     { label: 'Avaliação', done: false, icon: Star },
   ];
 
@@ -51,7 +46,7 @@ const BookingDetail = () => {
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex-1 px-6 pt-4 pb-8 space-y-4">
-        <h1 className="text-xl font-bold text-foreground">Detalhe da Viagem</h1>
+        <h1 className="text-xl font-bold text-foreground">Detalhe da Carona</h1>
 
         {/* Driver card */}
         <div className="bg-card rounded-2xl p-5 shadow-card">
@@ -67,7 +62,7 @@ const BookingDetail = () => {
               <div className="flex items-center gap-1 mt-0.5">
                 <Star className="w-3.5 h-3.5 text-warning fill-warning" />
                 <span className="text-xs font-semibold text-foreground">{mockDriver.avaliacaoMedia}</span>
-                <span className="text-xs text-muted-foreground ml-1">• {mockDriver.totalViagens} viagens</span>
+                <span className="text-xs text-muted-foreground ml-1">• {mockDriver.totalViagens} caronas</span>
               </div>
             </div>
           </div>
@@ -80,7 +75,7 @@ const BookingDetail = () => {
 
         {/* Trip data */}
         <div className="bg-card rounded-2xl p-5 shadow-card space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">📍 Dados da Viagem</h3>
+          <h3 className="text-sm font-semibold text-foreground">📍 Dados da Carona</h3>
           <InfoRow icon={MapPin} label="Presídio" value={trip.presidioNome} />
           <InfoRow icon={Calendar} label="Data e hora" value={`${new Date(trip.dataSaida).toLocaleDateString('pt-BR')} • ${trip.horaSaida}`} />
           <InfoRow icon={Users} label="Vagas reservadas" value={`${booking.quantidadeVagas}`} />
@@ -117,10 +112,11 @@ const BookingDetail = () => {
         {/* Actions */}
         <div className="space-y-3">
           {status === 'Confirmada' && (
-            <Button asChild className="w-full h-14 rounded-2xl bg-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,40%)] text-primary-foreground font-semibold">
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="w-5 h-5 mr-2" /> Falar com Motorista via WhatsApp
-              </a>
+            <Button
+              onClick={() => navigate(`/chat?contact=${trip.motoristaId}&as=u1`)}
+              className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" /> Conversar com Motorista
             </Button>
           )}
 

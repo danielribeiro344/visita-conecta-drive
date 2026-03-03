@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Calendar, Users, Phone, MessageCircle, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, MessageCircle, CheckCircle, XCircle, Shield } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { mockBookings } from '@/data/mockData';
@@ -22,10 +22,6 @@ const DriverRequestDetail = () => {
   }
 
   const total = booking.trip ? booking.trip.valor * booking.quantidadeVagas : 0;
-  const phone = (booking.passageiroTelefone || '').replace(/\D/g, '');
-  const whatsappUrl = `https://wa.me/55${phone}?text=${encodeURIComponent(
-    `Olá, vi sua reserva para a viagem do dia ${booking.trip ? new Date(booking.trip.dataSaida).toLocaleDateString('pt-BR') : ''} para o presídio ${booking.trip?.presidioNome || ''}.`
-  )}`;
 
   const handleApprove = () => {
     setStatus('Confirmada');
@@ -70,7 +66,7 @@ const DriverRequestDetail = () => {
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="bg-muted rounded-xl p-3 text-center">
               <p className="text-lg font-bold text-foreground">5</p>
-              <p className="text-muted-foreground">Viagens realizadas</p>
+              <p className="text-muted-foreground">Caronas realizadas</p>
             </div>
             <div className="bg-muted rounded-xl p-3 text-center">
               <p className="text-lg font-bold text-foreground flex items-center justify-center gap-1">
@@ -87,7 +83,7 @@ const DriverRequestDetail = () => {
             🎟️ Dados da Reserva
           </h3>
           <InfoRow label="Presídio" value={booking.trip?.presidioNome || ''} />
-          <InfoRow label="Data da viagem" value={booking.trip ? new Date(booking.trip.dataSaida).toLocaleDateString('pt-BR') : ''} />
+          <InfoRow label="Data da carona" value={booking.trip ? new Date(booking.trip.dataSaida).toLocaleDateString('pt-BR') : ''} />
           <InfoRow label="Vagas" value={`${booking.quantidadeVagas}`} />
           <InfoRow label="Valor total" value={`R$ ${total.toFixed(2)}`} />
           <InfoRow label="Status" value={status} />
@@ -107,10 +103,11 @@ const DriverRequestDetail = () => {
           )}
 
           {status === 'Confirmada' && (
-            <Button asChild className="w-full h-14 rounded-2xl bg-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,40%)] text-primary-foreground font-semibold">
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="w-5 h-5 mr-2" /> Falar via WhatsApp
-              </a>
+            <Button
+              onClick={() => navigate(`/chat?contact=${booking.passageiroId}&as=u2`)}
+              className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" /> Enviar mensagem
             </Button>
           )}
 
