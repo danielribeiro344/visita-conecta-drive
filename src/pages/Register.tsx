@@ -6,11 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+const VEHICLE_TYPES: { label: string; capacity: number }[] = [
+  { label: 'Carro (sedan/hatch) — 4 lugares', capacity: 4 },
+  { label: 'SUV / Minivan — 7 lugares', capacity: 7 },
+  { label: 'Van — 15 lugares', capacity: 15 },
+  { label: 'Micro-ônibus — 20 lugares', capacity: 20 },
+];
+
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState<'profile' | 'driver'>('profile');
   const [selectedRole, setSelectedRole] = useState<'PASSAGEIRO' | 'MOTORISTA' | null>(null);
+  const [vehicleType, setVehicleType] = useState('');
 
   const handleSubmit = () => {
     if (selectedRole === 'MOTORISTA' && step === 'profile') {
@@ -24,22 +32,14 @@ const Register = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <div className="px-4 pt-4">
         <button
-          onClick={() => {
-            if (step === 'driver') setStep('profile');
-            else navigate('/');
-          }}
+          onClick={() => { if (step === 'driver') setStep('profile'); else navigate('/'); }}
           className="p-2 -ml-2 rounded-xl hover:bg-muted"
         >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
       </div>
 
-      <motion.div
-        key={step}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="flex-1 px-6 pt-6 pb-8 overflow-y-auto"
-      >
+      <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex-1 px-6 pt-6 pb-8 overflow-y-auto">
         {step === 'profile' ? (
           <>
             <h1 className="text-2xl font-bold text-foreground mb-1">Criar conta</h1>
@@ -65,59 +65,38 @@ const Register = () => {
               <div className="space-y-2">
                 <Label>Senha</Label>
                 <div className="relative">
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Mínimo 8 caracteres"
-                    className="h-12 rounded-xl pr-12"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  >
+                  <Input type={showPassword ? 'text' : 'password'} placeholder="Mínimo 8 caracteres" className="h-12 rounded-xl pr-12" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
-              {/* Role selection */}
               <div className="space-y-2 pt-2">
                 <Label>Como deseja usar o app?</Label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setSelectedRole('PASSAGEIRO')}
                     className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-                      selectedRole === 'PASSAGEIRO'
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-muted-foreground/30'
+                      selectedRole === 'PASSAGEIRO' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                     }`}
                   >
                     <User className={`w-6 h-6 ${selectedRole === 'PASSAGEIRO' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`text-sm font-medium ${selectedRole === 'PASSAGEIRO' ? 'text-primary' : 'text-foreground'}`}>
-                      Passageiro
-                    </span>
+                    <span className={`text-sm font-medium ${selectedRole === 'PASSAGEIRO' ? 'text-primary' : 'text-foreground'}`}>Passageiro</span>
                   </button>
                   <button
                     onClick={() => setSelectedRole('MOTORISTA')}
                     className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-                      selectedRole === 'MOTORISTA'
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-muted-foreground/30'
+                      selectedRole === 'MOTORISTA' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                     }`}
                   >
                     <Car className={`w-6 h-6 ${selectedRole === 'MOTORISTA' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`text-sm font-medium ${selectedRole === 'MOTORISTA' ? 'text-primary' : 'text-foreground'}`}>
-                      Motorista
-                    </span>
+                    <span className={`text-sm font-medium ${selectedRole === 'MOTORISTA' ? 'text-primary' : 'text-foreground'}`}>Motorista</span>
                   </button>
                 </div>
               </div>
 
-              <Button
-                onClick={handleSubmit}
-                disabled={!selectedRole}
-                className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground mt-4"
-              >
+              <Button onClick={handleSubmit} disabled={!selectedRole} className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground mt-4">
                 {selectedRole === 'MOTORISTA' ? 'Próximo' : 'Criar conta'}
               </Button>
             </div>
@@ -144,6 +123,22 @@ const Register = () => {
                 <Label>Placa do veículo</Label>
                 <Input placeholder="ABC-1D23" className="h-12 rounded-xl" />
               </div>
+
+              {/* Vehicle type / capacity */}
+              <div className="space-y-2">
+                <Label>Tipo do veículo (capacidade DETRAN)</Label>
+                <select
+                  value={vehicleType}
+                  onChange={(e) => setVehicleType(e.target.value)}
+                  className="w-full h-12 rounded-xl bg-muted px-3 text-sm text-foreground border-0 outline-none"
+                >
+                  <option value="">Selecione o tipo</option>
+                  {VEHICLE_TYPES.map(v => (
+                    <option key={v.capacity} value={v.capacity}>{v.label}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="space-y-2">
                 <Label>Documento do veículo</Label>
                 <div className="border-2 border-dashed border-border rounded-2xl p-6 text-center">
@@ -151,18 +146,14 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Status badge */}
               <div className="bg-warning/10 border border-warning/20 rounded-2xl p-4 flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-warning mt-1.5 shrink-0" />
                 <p className="text-sm text-foreground">
-                  Seu cadastro ficará com status <strong>"Aguardando aprovação"</strong> até a verificação dos documentos.
+                  Seu cadastro ficará com status <strong>"Aguardando aprovação"</strong> até a verificação dos documentos. A capacidade de vagas será validada pelo cadastro DETRAN do veículo.
                 </p>
               </div>
 
-              <Button
-                onClick={handleSubmit}
-                className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground"
-              >
+              <Button onClick={handleSubmit} className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground">
                 Finalizar cadastro
               </Button>
             </div>

@@ -17,7 +17,7 @@ const BottomNav = ({ active, isDriver = false }: BottomNavProps) => {
   ];
 
   const driverItems = [
-    { id: 'trips' as const, label: 'Viagens', icon: MapPin, path: '/my-trips' },
+    { id: 'trips' as const, label: 'Caronas', icon: MapPin, path: '/my-trips' },
     { id: 'create' as const, label: 'Criar', icon: PlusCircle, path: '/create-trip' },
     { id: 'requests' as const, label: 'Pedidos', icon: Inbox, path: '/driver-requests' },
     { id: 'notifications' as const, label: 'Avisos', icon: Bell, path: '/notifications?role=motorista' },

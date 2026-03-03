@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { mockPrisons } from '@/data/mockData';
+import { mockPrisons, mockDriverDetail } from '@/data/mockData';
 import { toast } from 'sonner';
 import BottomNav from '@/components/BottomNav';
 
@@ -17,8 +17,24 @@ const CreateTrip = () => {
   const [price, setPrice] = useState('');
   const [seats, setSeats] = useState('');
 
+  const maxSeats = mockDriverDetail.capacidadeVeiculo;
+  const seatsNum = parseInt(seats) || 0;
+  const seatsExceeded = seatsNum > maxSeats;
+
   const handleCreate = () => {
-    toast.success('Viagem criada com sucesso!');
+    if (!prison || !date || !time || !price || !seats) {
+      toast.error('Preencha todos os campos');
+      return;
+    }
+    if (seatsNum < 1) {
+      toast.error('Informe pelo menos 1 vaga');
+      return;
+    }
+    if (seatsExceeded) {
+      toast.error(`Seu veículo (${mockDriverDetail.veiculoModelo}) comporta no máximo ${maxSeats} passageiros conforme cadastro DETRAN.`);
+      return;
+    }
+    toast.success('Carona criada com sucesso!');
     navigate('/my-trips');
   };
 
@@ -30,13 +46,9 @@ const CreateTrip = () => {
         </button>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="px-6 pt-4"
-      >
-        <h1 className="text-2xl font-bold text-foreground mb-1">Criar viagem</h1>
-        <p className="text-muted-foreground text-sm mb-6">Preencha os dados da viagem</p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="px-6 pt-4">
+        <h1 className="text-2xl font-bold text-foreground mb-1">Criar carona</h1>
+        <p className="text-muted-foreground text-sm mb-6">Preencha os dados da carona</p>
 
         <div className="space-y-4">
           <div className="space-y-2">
@@ -67,13 +79,7 @@ const CreateTrip = () => {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Valor por passageiro</Label>
-              <Input
-                type="number"
-                placeholder="R$ 0,00"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="h-12 rounded-xl"
-              />
+              <Input type="number" placeholder="R$ 0,00" value={price} onChange={(e) => setPrice(e.target.value)} className="h-12 rounded-xl" />
             </div>
             <div className="space-y-2">
               <Label>Total de vagas</Label>
@@ -82,16 +88,33 @@ const CreateTrip = () => {
                 placeholder="0"
                 value={seats}
                 onChange={(e) => setSeats(e.target.value)}
-                className="h-12 rounded-xl"
+                className={`h-12 rounded-xl ${seatsExceeded ? 'border-destructive ring-destructive' : ''}`}
+                max={maxSeats}
               />
+            </div>
+          </div>
+
+          {/* Vehicle capacity info */}
+          <div className={`rounded-2xl p-4 flex items-start gap-3 ${seatsExceeded ? 'bg-destructive/10 border border-destructive/20' : 'bg-muted'}`}>
+            {seatsExceeded && <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />}
+            <div className="text-sm">
+              <p className={seatsExceeded ? 'text-destructive font-medium' : 'text-muted-foreground'}>
+                {seatsExceeded
+                  ? `Quantidade excede a capacidade do veículo!`
+                  : `Capacidade do veículo (DETRAN):`}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {mockDriverDetail.veiculoModelo} — máx. <strong>{maxSeats}</strong> passageiros
+              </p>
             </div>
           </div>
 
           <Button
             onClick={handleCreate}
+            disabled={seatsExceeded}
             className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground mt-4"
           >
-            Criar viagem
+            Criar carona
           </Button>
         </div>
       </motion.div>

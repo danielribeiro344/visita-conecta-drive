@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, Users, XCircle } from 'lucide-react';
+import { Calendar, Users, XCircle, ChevronRight } from 'lucide-react';
 import { mockTrips } from '@/data/mockData';
 import { TripStatus } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,16 +22,15 @@ const MyTrips = () => {
   const upcoming = driverTrips.filter(t => t.status === 'Ativa');
   const full = driverTrips.filter(t => t.status === 'Lotada');
   const finished = driverTrips.filter(t => t.status === 'Finalizada');
-  const cancelled = driverTrips.filter(t => t.status === 'Cancelada');
 
   const handleCancel = (tripId: string) => {
-    toast.info('Viagem cancelada');
+    toast.info('Carona cancelada');
   };
 
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="px-6 pt-12">
-        <h1 className="text-xl font-bold text-foreground mb-4">Minhas Viagens</h1>
+        <h1 className="text-xl font-bold text-foreground mb-4">Minhas Caronas</h1>
 
         <Tabs defaultValue="upcoming" className="w-full">
           <TabsList className="w-full bg-muted rounded-2xl h-11 p-1 mb-4">
@@ -48,19 +47,19 @@ const MyTrips = () => {
 
           <TabsContent value="upcoming" className="space-y-3">
             {upcoming.map((trip, i) => (
-              <TripItem key={trip.id} trip={trip} index={i} onCancel={() => handleCancel(trip.id)} />
+              <TripItem key={trip.id} trip={trip} index={i} onCancel={() => handleCancel(trip.id)} onDetail={() => navigate(`/trip/${trip.id}`)} />
             ))}
             {upcoming.length === 0 && <Empty />}
           </TabsContent>
           <TabsContent value="full" className="space-y-3">
             {full.map((trip, i) => (
-              <TripItem key={trip.id} trip={trip} index={i} />
+              <TripItem key={trip.id} trip={trip} index={i} onDetail={() => navigate(`/trip/${trip.id}`)} />
             ))}
             {full.length === 0 && <Empty />}
           </TabsContent>
           <TabsContent value="done" className="space-y-3">
             {finished.map((trip, i) => (
-              <TripItem key={trip.id} trip={trip} index={i} />
+              <TripItem key={trip.id} trip={trip} index={i} onDetail={() => navigate(`/trip/${trip.id}`)} />
             ))}
             {finished.length === 0 && <Empty />}
           </TabsContent>
@@ -72,13 +71,14 @@ const MyTrips = () => {
   );
 };
 
-function TripItem({ trip, index, onCancel }: { trip: any; index: number; onCancel?: () => void }) {
+function TripItem({ trip, index, onCancel, onDetail }: { trip: any; index: number; onCancel?: () => void; onDetail: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="bg-card rounded-2xl p-4 shadow-card"
+      className="bg-card rounded-2xl p-4 shadow-card cursor-pointer"
+      onClick={onDetail}
     >
       <div className="flex items-start justify-between mb-2">
         <p className="text-sm font-semibold text-foreground">{trip.presidioNome}</p>
@@ -98,12 +98,15 @@ function TripItem({ trip, index, onCancel }: { trip: any; index: number; onCance
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-border">
         <p className="text-sm font-bold text-primary">R$ {trip.valor.toFixed(2)}/pessoa</p>
-        {onCancel && trip.status === 'Ativa' && (
-          <button onClick={onCancel} className="flex items-center gap-1 text-xs text-destructive font-medium">
-            <XCircle className="w-3.5 h-3.5" />
-            Cancelar
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {onCancel && trip.status === 'Ativa' && (
+            <button onClick={(e) => { e.stopPropagation(); onCancel(); }} className="flex items-center gap-1 text-xs text-destructive font-medium">
+              <XCircle className="w-3.5 h-3.5" />
+              Cancelar
+            </button>
+          )}
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </div>
       </div>
     </motion.div>
   );
@@ -112,7 +115,7 @@ function TripItem({ trip, index, onCancel }: { trip: any; index: number; onCance
 function Empty() {
   return (
     <div className="text-center py-10 text-muted-foreground">
-      <p className="text-sm">Nenhuma viagem nesta categoria</p>
+      <p className="text-sm">Nenhuma carona nesta categoria</p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Bus, Shield } from 'lucide-react';
+import { Car, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import onboardingHero from '@/assets/onboarding-hero.jpg';
 
@@ -9,15 +9,12 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Hero image background */}
       <div className="absolute inset-0">
         <img src={onboardingHero} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 gradient-hero opacity-85" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen px-6 safe-bottom">
-        {/* Logo area */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -25,17 +22,15 @@ const Onboarding = () => {
           className="flex items-center gap-3 pt-16"
         >
           <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-            <Bus className="w-6 h-6 text-secondary-foreground" />
+            <Car className="w-6 h-6 text-secondary-foreground" />
           </div>
           <span className="text-2xl font-bold text-primary-foreground tracking-tight">
-            ConectaVisita
+            bpis caronas
           </span>
         </motion.div>
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Text content */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -43,14 +38,13 @@ const Onboarding = () => {
           className="mb-10"
         >
           <h1 className="text-4xl font-extrabold text-primary-foreground leading-tight mb-4">
-            Transporte seguro<br />para dias de visita
+            Caronas seguras<br />para dias de visita
           </h1>
           <p className="text-primary-foreground/70 text-lg leading-relaxed">
             Encontre motoristas verificados e viaje com tranquilidade para visitar quem você ama.
           </p>
         </motion.div>
 
-        {/* Trust badge */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -58,10 +52,9 @@ const Onboarding = () => {
           className="flex items-center gap-2 mb-8"
         >
           <Shield className="w-4 h-4 text-secondary" />
-          <span className="text-sm text-primary-foreground/60">Motoristas verificados • Viagens seguras</span>
+          <span className="text-sm text-primary-foreground/60">Motoristas verificados • Caronas seguras</span>
         </motion.div>
 
-        {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

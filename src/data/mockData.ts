@@ -1,4 +1,4 @@
-import { Prison, Trip, Booking, User, DriverDetail } from '@/types';
+import { Prison, Trip, Booking, User, DriverDetail, ChatMessage } from '@/types';
 
 export const mockUser: User = {
   id: 'u1',
@@ -32,6 +32,7 @@ export const mockDriverDetail: DriverDetail = {
   cnhValidade: '2027-05-15',
   veiculoModelo: 'Fiat Ducato 2022',
   veiculoPlaca: 'ABC-1D23',
+  capacidadeVeiculo: 15,
   aprovado: true,
 };
 
@@ -213,7 +214,7 @@ export const mockNotificationsDriver: Notification[] = [
     id: 'n3',
     tipo: 'reserva_nova',
     titulo: 'Nova solicitação de reserva',
-    mensagem: 'Ana Oliveira solicitou 1 vaga para a viagem de 08/03 (Tremembé).',
+    mensagem: 'Ana Oliveira solicitou 1 vaga para a carona de 08/03 (Tremembé).',
     data: '2026-02-27T09:00:00',
     lida: false,
   },
@@ -221,7 +222,7 @@ export const mockNotificationsDriver: Notification[] = [
     id: 'n4',
     tipo: 'reserva_nova',
     titulo: 'Nova solicitação de reserva',
-    mensagem: 'João Pereira solicitou 2 vagas para a viagem de 08/03 (Tremembé).',
+    mensagem: 'João Pereira solicitou 2 vagas para a carona de 08/03 (Tremembé).',
     data: '2026-02-27T08:15:00',
     lida: false,
   },
@@ -229,8 +230,38 @@ export const mockNotificationsDriver: Notification[] = [
     id: 'n5',
     tipo: 'cancelamento_passageiro',
     titulo: 'Cancelamento de passageiro',
-    mensagem: 'Roberto Lima cancelou a reserva para a viagem de 01/03.',
+    mensagem: 'Roberto Lima cancelou a reserva para a carona de 01/03.',
     data: '2026-02-24T16:00:00',
     lida: true,
+  },
+];
+
+export const mockChatMessages: ChatMessage[] = [
+  {
+    id: 'msg1',
+    senderId: 'u1',
+    senderNome: 'Maria Silva',
+    receiverId: 'u2',
+    message: 'Olá Carlos, gostaria de confirmar o ponto de encontro para a carona de sábado.',
+    timestamp: '2026-02-26T14:30:00',
+    read: true,
+  },
+  {
+    id: 'msg2',
+    senderId: 'u2',
+    senderNome: 'Carlos Santos',
+    receiverId: 'u1',
+    message: 'Oi Maria! Saímos do Terminal Rodoviário de São Paulo, portão 3. Chego às 4:45.',
+    timestamp: '2026-02-26T14:35:00',
+    read: true,
+  },
+  {
+    id: 'msg3',
+    senderId: 'u1',
+    senderNome: 'Maria Silva',
+    receiverId: 'u2',
+    message: 'Perfeito, estarei lá! Obrigada.',
+    timestamp: '2026-02-26T14:40:00',
+    read: false,
   },
 ];
