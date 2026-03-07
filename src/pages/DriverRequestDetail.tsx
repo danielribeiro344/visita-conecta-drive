@@ -1,37 +1,67 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, MessageCircle, CheckCircle, XCircle, Shield } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { mockBookings } from '@/data/mockData';
-import { toast } from 'sonner';
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Star, MapPin, MessageCircle, CheckCircle, XCircle, Shield } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api, normalizeReservaStatus } from "@/lib/api";
+import { useAppData } from "@/hooks/useAppData";
 
 const DriverRequestDetail = () => {
-  const { id } = useParams();
+  const { id = "" } = useParams();
   const navigate = useNavigate();
-  const booking = mockBookings.find(b => b.id === id);
-  const [status, setStatus] = useState(booking?.status || 'Pendente');
+  const queryClient = useQueryClient();
 
-  if (!booking) {
+  const { trips, usersById } = useAppData();
+
+  const reservaQuery = useQuery({
+    queryKey: ["reserva", id],
+    queryFn: () => api.getReserva(id),
+    enabled: Boolean(id),
+  });
+
+  const raw = reservaQuery.data;
+  const trip = raw ? trips.find((item) => item.id === raw.viagemId) : undefined;
+  const passenger = raw ? usersById.get(raw.passageiroId) : undefined;
+
+  const [status, setStatus] = useState(raw ? normalizeReservaStatus(raw.status) : "Pendente");
+
+  useEffect(() => {
+    if (raw) {
+      setStatus(normalizeReservaStatus(raw.status));
+    }
+  }, [raw]);
+
+  const statusMutation = useMutation({
+    mutationFn: (nextStatus: number) => api.patchReservaStatus(id, { status: nextStatus, avaliacaoMotorista: nextStatus === 2 ? 5 : undefined }),
+    onSuccess: (_, nextStatus) => {
+      const local = nextStatus === 2 ? "Confirmada" : "Cancelada";
+      setStatus(local);
+      queryClient.invalidateQueries({ queryKey: ["reservas"] });
+      toast.success(local === "Confirmada" ? "Reserva aprovada com sucesso" : "Reserva recusada");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  if (reservaQuery.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Reserva não encontrada</p>
+        <p className="text-muted-foreground">Carregando reserva...</p>
       </div>
     );
   }
 
-  const total = booking.trip ? booking.trip.valor * booking.quantidadeVagas : 0;
+  if (!raw) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Reserva nao encontrada</p>
+      </div>
+    );
+  }
 
-  const handleApprove = () => {
-    setStatus('Confirmada');
-    toast.success('Reserva aprovada com sucesso!');
-  };
-
-  const handleReject = () => {
-    setStatus('Cancelada');
-    toast.info('Reserva recusada.');
-  };
+  const total = trip ? trip.valor * raw.quantidadeVagas : 0;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -44,18 +74,15 @@ const DriverRequestDetail = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex-1 px-6 pt-4 pb-8 space-y-4">
         <h1 className="text-xl font-bold text-foreground">Detalhe da Reserva</h1>
 
-        {/* Passenger data */}
         <div className="bg-card rounded-2xl p-5 shadow-card">
           <div className="flex items-center gap-3 mb-4">
             <Avatar className="w-14 h-14">
-              <AvatarFallback className="bg-secondary/20 text-secondary text-lg font-bold">
-                {(booking.passageiroNome || 'P').charAt(0)}
-              </AvatarFallback>
+              <AvatarFallback className="bg-secondary/20 text-secondary text-lg font-bold">{(passenger?.nome || "P").charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-base font-bold text-foreground">{booking.passageiroNome}</h2>
+              <h2 className="text-base font-bold text-foreground">{passenger?.nome ?? "Passageiro"}</h2>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> {booking.passageiroCidade || 'São Paulo'}
+                <MapPin className="w-3 h-3" /> {passenger?.cidade || "Sao Paulo"}
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -65,58 +92,43 @@ const DriverRequestDetail = () => {
           </div>
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="bg-muted rounded-xl p-3 text-center">
-              <p className="text-lg font-bold text-foreground">5</p>
+              <p className="text-lg font-bold text-foreground">-</p>
               <p className="text-muted-foreground">Caronas realizadas</p>
             </div>
             <div className="bg-muted rounded-xl p-3 text-center">
               <p className="text-lg font-bold text-foreground flex items-center justify-center gap-1">
-                <Shield className="w-4 h-4 text-secondary" /> Ativo
+                <Shield className="w-4 h-4 text-secondary" /> {passenger?.status ?? "Ativo"}
               </p>
               <p className="text-muted-foreground">Status da conta</p>
             </div>
           </div>
         </div>
 
-        {/* Booking data */}
         <div className="bg-card rounded-2xl p-5 shadow-card space-y-3">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            🎟️ Dados da Reserva
-          </h3>
-          <InfoRow label="Presídio" value={booking.trip?.presidioNome || ''} />
-          <InfoRow label="Data da carona" value={booking.trip ? new Date(booking.trip.dataSaida).toLocaleDateString('pt-BR') : ''} />
-          <InfoRow label="Vagas" value={`${booking.quantidadeVagas}`} />
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">Dados da Reserva</h3>
+          <InfoRow label="Presidio" value={trip?.presidioNome || ""} />
+          <InfoRow label="Data da carona" value={trip ? new Date(trip.dataSaida).toLocaleDateString("pt-BR") : ""} />
+          <InfoRow label="Vagas" value={`${raw.quantidadeVagas}`} />
           <InfoRow label="Valor total" value={`R$ ${total.toFixed(2)}`} />
           <InfoRow label="Status" value={status} />
         </div>
 
-        {/* Actions */}
         <div className="space-y-3">
-          {status === 'Pendente' && (
+          {status === "Pendente" && (
             <div className="flex gap-3">
-              <Button onClick={handleApprove} className="flex-1 h-14 rounded-2xl gradient-primary text-primary-foreground font-semibold">
+              <Button onClick={() => statusMutation.mutate(2)} className="flex-1 h-14 rounded-2xl gradient-primary text-primary-foreground font-semibold">
                 <CheckCircle className="w-5 h-5 mr-2" /> Aprovar
               </Button>
-              <Button onClick={handleReject} variant="outline" className="flex-1 h-14 rounded-2xl border-destructive text-destructive font-semibold">
+              <Button onClick={() => statusMutation.mutate(3)} variant="outline" className="flex-1 h-14 rounded-2xl border-destructive text-destructive font-semibold">
                 <XCircle className="w-5 h-5 mr-2" /> Recusar
               </Button>
             </div>
           )}
 
-          {status === 'Confirmada' && (
-            <Button
-              onClick={() => navigate(`/chat?contact=${booking.passageiroId}&as=u2`)}
-              className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
-            >
+          {status === "Confirmada" && (
+            <Button onClick={() => navigate(`/chat?contact=${raw.passageiroId}&as=${trip?.motoristaId}`)} className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
               <MessageCircle className="w-5 h-5 mr-2" /> Enviar mensagem
             </Button>
-          )}
-
-          {status !== 'Pendente' && (
-            <div className={`rounded-2xl p-4 text-center text-sm font-medium ${
-              status === 'Confirmada' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
-            }`}>
-              {status === 'Confirmada' ? '✅ Reserva aprovada' : '❌ Reserva recusada'}
-            </div>
           )}
         </div>
       </motion.div>

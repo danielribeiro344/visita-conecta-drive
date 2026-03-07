@@ -1,21 +1,115 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Shield, Car, LogOut, Pencil, Trash2, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { mockUser, mockDriver, mockDriverDetail } from '@/data/mockData';
-import BottomNav from '@/components/BottomNav';
+import { useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, Star, MapPin, Shield, Car, LogOut, Pencil, Trash2, ChevronRight, RefreshCcw } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import BottomNav from "@/components/BottomNav";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api, normalizeUsuarioStatus } from "@/lib/api";
+import { clearSession, getSession } from "@/lib/session";
+import { toast } from "sonner";
 
 const Profile = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isDriver = searchParams.get('role') === 'motorista';
-  const user = isDriver ? mockDriver : mockUser;
-  const detail = isDriver ? mockDriverDetail : null;
+  const isDriver = searchParams.get("role") === "motorista";
+  const session = getSession();
+  const queryClient = useQueryClient();
 
-  const maskedCpf = user.cpf.replace(/(\d{3})\.\d{3}\.\d{3}(-\d{2})/, '$1.***.***$2');
-  const maskedPlaca = detail ? detail.veiculoPlaca.replace(/(.{3}).(.{4})/, '$1-****') : '';
-  const maskedCnh = detail ? detail.cnhNumero.replace(/^(.{3}).*(.{2})$/, '$1*****$2') : '';
+  const userQuery = useQuery({
+    queryKey: ["usuario", session?.userId],
+    queryFn: () => api.getUsuario(Number(session?.userId) ?? 0),
+    enabled: Boolean(session?.userId),
+  });
+
+  const driverQuery = useQuery({
+    queryKey: ["motorista", session?.userId],
+    queryFn: () => api.getMotorista(session?.userId ?? ""),
+    enabled: Boolean(session?.userId && isDriver),
+  });
+
+  const refreshMutation = useMutation({
+    mutationFn: async () => {
+      if (!session?.userId || !userQuery.data) throw new Error("Usuario nao carregado");
+      const updatedUser = await api.updateUsuario(Number(session.userId), {
+        nome: userQuery.data.nome,
+        email: userQuery.data.email,
+        telefone: userQuery.data.telefone,
+        senhaHash: userQuery.data.senhaHash ?? "",
+        cpf: userQuery.data.cpf,
+        status: userQuery.data.status,
+        emailVerificado: userQuery.data.emailVerificado,
+        telefoneVerificado: userQuery.data.telefoneVerificado,
+        perfis: userQuery.data.perfis,
+      });
+
+      if (isDriver && detail) {
+        await api.updateMotorista(session.userId, {
+          usuarioId: session.userId,
+          cnhNumero: detail.cnhNumero,
+          cnhValidade: detail.cnhValidade,
+          veiculoModelo: detail.veiculoModelo,
+          veiculoPlaca: detail.veiculoPlaca,
+          aprovado: detail.aprovado,
+          capacidadeVeiculo: detail.capacidadeVeiculo,
+        });
+      }
+
+      return updatedUser;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["usuario", session?.userId] });
+      toast.success("Perfil sincronizado com backend");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      if (!session?.userId) throw new Error("Sessao invalida");
+
+      if (isDriver) {
+        await api.deleteMotorista(session.userId);
+      }
+
+      await api.deleteUsuario(session.userId);
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      clearSession();
+      toast.success("Conta excluida");
+      navigate("/");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const user =
+    userQuery.data ??
+    (session
+      ? {
+          id: session.userId,
+          nome: session.userName,
+          email: session.email ?? "-",
+          telefone: "-",
+          cpf: "-",
+          status: 1,
+        }
+      : undefined);
+  const detail = driverQuery.data;
+
+  const maskedCpf = useMemo(() => {
+    const digits = (user?.cpf ?? "").replace(/\D/g, "");
+    if (digits.length !== 11) return user?.cpf ?? "-";
+    return `${digits.slice(0, 3)}.***.***-${digits.slice(9)}`;
+  }, [user?.cpf]);
+
+  const maskedPlaca = detail?.veiculoPlaca ? `${detail.veiculoPlaca.slice(0, 3)}-****` : "";
+  const maskedCnh = detail?.cnhNumero ? `${detail.cnhNumero.slice(0, 3)}*****${detail.cnhNumero.slice(-2)}` : "";
+
+  if (!user) {
+    return <div className="min-h-screen bg-background flex items-center justify-center">Carregando perfil...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -24,21 +118,14 @@ const Profile = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <Avatar className="w-20 h-20 mx-auto mb-3 ring-4 ring-primary-foreground/20">
-          <AvatarFallback className="bg-secondary text-secondary-foreground text-2xl font-bold">
-            {user.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-          </AvatarFallback>
+          <AvatarFallback className="bg-secondary text-secondary-foreground text-2xl font-bold">{user.nome.split(" ").map((n) => n[0]).join("").slice(0, 2)}</AvatarFallback>
         </Avatar>
         <h1 className="text-lg font-bold text-primary-foreground">{user.nome}</h1>
-        <p className="text-primary-foreground/60 text-sm">{user.cidade || 'São Paulo'}</p>
+        <p className="text-primary-foreground/60 text-sm">{session?.role === "MOTORISTA" ? "Motorista" : "Passageiro"}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
-          <div className="text-center">
-            <p className="text-lg font-bold text-primary-foreground">{user.totalViagens || 0}</p>
-            <p className="text-[10px] text-primary-foreground/60 uppercase">Caronas</p>
-          </div>
-          <div className="w-px h-8 bg-primary-foreground/20" />
           <div className="text-center flex items-center gap-1">
             <Star className="w-4 h-4 text-warning fill-warning" />
-            <p className="text-lg font-bold text-primary-foreground">{user.avaliacaoMedia || '—'}</p>
+            <p className="text-lg font-bold text-primary-foreground">-</p>
           </div>
           {isDriver && detail?.aprovado && (
             <>
@@ -54,47 +141,64 @@ const Profile = () => {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="px-6 mt-6 space-y-4">
         <div className="bg-card rounded-2xl p-5 shadow-card space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Informações pessoais</h2>
+          <h2 className="text-sm font-semibold text-foreground">Informacoes pessoais</h2>
           <InfoRow label="Email" value={user.email} />
           <InfoRow label="Telefone" value={user.telefone} />
           <InfoRow label="CPF" value={maskedCpf} />
-          <InfoRow label="Status" value={user.status} />
+          <InfoRow label="Status" value={normalizeUsuarioStatus(user.status)} />
         </div>
 
         {isDriver && detail && (
           <div className="bg-card rounded-2xl p-5 shadow-card space-y-3">
             <div className="flex items-center gap-2">
               <Car className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-semibold text-foreground">Veículo</h2>
+              <h2 className="text-sm font-semibold text-foreground">Veiculo</h2>
             </div>
             <InfoRow label="Modelo" value={detail.veiculoModelo} />
             <InfoRow label="Placa" value={maskedPlaca} />
-            <InfoRow label="Capacidade" value={`${detail.capacidadeVeiculo} passageiros`} />
+            <InfoRow label="Capacidade" value={`${detail.capacidadeVeiculo ?? 4} passageiros`} />
             <InfoRow label="CNH" value={maskedCnh} />
-            <InfoRow label="Aprovação" value={detail.aprovado ? '✅ Aprovado' : '⏳ Pendente'} />
+            <InfoRow label="Aprovacao" value={detail.aprovado ? "Aprovado" : "Pendente"} />
           </div>
         )}
 
         <div className="space-y-2">
-          <Button variant="outline" className="w-full justify-between h-12 rounded-2xl" onClick={() => {}}>
-            <span className="flex items-center gap-2"><Pencil className="w-4 h-4" /> Editar perfil</span>
+          <Button variant="outline" className="w-full justify-between h-12 rounded-2xl" onClick={() => refreshMutation.mutate()}>
+            <span className="flex items-center gap-2">
+              <RefreshCcw className="w-4 h-4" /> Sincronizar perfil
+            </span>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </Button>
 
           {isDriver && (
-            <Button variant="outline" className="w-full justify-between h-12 rounded-2xl" onClick={() => navigate('/my-trips')}>
-              <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> Ver minhas caronas</span>
+            <Button variant="outline" className="w-full justify-between h-12 rounded-2xl" onClick={() => navigate("/my-trips")}>
+              <span className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" /> Ver minhas caronas
+              </span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Button>
           )}
 
-          <Button variant="outline" className="w-full justify-between h-12 rounded-2xl text-destructive hover:text-destructive" onClick={() => navigate('/')}>
-            <span className="flex items-center gap-2"><LogOut className="w-4 h-4" /> Sair</span>
+          <Button
+            variant="outline"
+            className="w-full justify-between h-12 rounded-2xl"
+            onClick={() => {
+              clearSession();
+              navigate("/");
+            }}
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="w-4 h-4" /> Sair
+            </span>
             <ChevronRight className="w-4 h-4" />
           </Button>
 
-          <Button variant="ghost" className="w-full h-10 text-xs text-muted-foreground" onClick={() => {}}>
+          <Button variant="ghost" className="w-full h-10 text-xs text-destructive" onClick={() => deleteMutation.mutate()}>
             <Trash2 className="w-3.5 h-3.5 mr-1" /> Excluir conta
+          </Button>
+
+          <Button variant="ghost" className="w-full h-10 text-xs text-muted-foreground" onClick={() => {}}>
+            <Pencil className="w-3.5 h-3.5 mr-1" /> Edicao manual (em breve)
           </Button>
         </div>
       </motion.div>

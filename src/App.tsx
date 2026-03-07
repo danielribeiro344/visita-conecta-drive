@@ -21,7 +21,14 @@ import Notifications from "./pages/Notifications";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

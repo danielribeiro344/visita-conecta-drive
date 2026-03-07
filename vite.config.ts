@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/backend": {
+        target: "https://erh4972xsh.execute-api.us-east-1.amazonaws.com",
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/backend/, ""),
+      },
+    },
     hmr: {
       overlay: false,
     },

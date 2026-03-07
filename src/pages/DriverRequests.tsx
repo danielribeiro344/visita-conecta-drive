@@ -1,26 +1,33 @@
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, Users, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { mockBookings } from '@/data/mockData';
-import { BookingStatus } from '@/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import BottomNav from '@/components/BottomNav';
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, Calendar, Users, ChevronRight } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { BookingStatus } from "@/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BottomNav from "@/components/BottomNav";
+import { useAppData } from "@/hooks/useAppData";
+import { getSession } from "@/lib/session";
 
 const statusColors: Record<BookingStatus, string> = {
-  Pendente: 'bg-warning/10 text-warning',
-  Confirmada: 'bg-success/10 text-success',
-  Cancelada: 'bg-destructive/10 text-destructive',
+  Pendente: "bg-warning/10 text-warning",
+  Confirmada: "bg-success/10 text-success",
+  Cancelada: "bg-destructive/10 text-destructive",
 };
 
 const DriverRequests = () => {
   const navigate = useNavigate();
-  // Show bookings for driver's trips
-  const driverBookings = mockBookings.filter(b => b.trip?.motoristaId === 'u2');
+  const session = getSession();
+  const { bookings } = useAppData();
 
-  const pendentes = driverBookings.filter(b => b.status === 'Pendente');
-  const confirmadas = driverBookings.filter(b => b.status === 'Confirmada');
-  const canceladas = driverBookings.filter(b => b.status === 'Cancelada');
+  const driverBookings = useMemo(
+    () => bookings.filter((booking) => booking.trip?.motoristaId === Number(session?.userId)),
+    [bookings, session?.userId],
+  );
+
+  const pendentes = driverBookings.filter((b) => b.status === "Pendente");
+  const confirmadas = driverBookings.filter((b) => b.status === "Confirmada");
+  const canceladas = driverBookings.filter((b) => b.status === "Cancelada");
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -30,7 +37,7 @@ const DriverRequests = () => {
         </button>
       </div>
       <div className="px-6 pt-2">
-        <h1 className="text-xl font-bold text-foreground mb-4">Solicitações Recebidas</h1>
+        <h1 className="text-xl font-bold text-foreground mb-4">Solicitacoes Recebidas</h1>
 
         <Tabs defaultValue="pending" className="w-full">
           <TabsList className="w-full bg-muted rounded-2xl h-11 p-1 mb-4">
@@ -46,9 +53,9 @@ const DriverRequests = () => {
           </TabsList>
 
           {[
-            { key: 'pending', items: pendentes },
-            { key: 'confirmed', items: confirmadas },
-            { key: 'cancelled', items: canceladas },
+            { key: "pending", items: pendentes },
+            { key: "confirmed", items: confirmadas },
+            { key: "cancelled", items: canceladas },
           ].map(({ key, items }) => (
             <TabsContent key={key} value={key} className="space-y-3">
               {items.map((booking, i) => (
@@ -62,23 +69,19 @@ const DriverRequests = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
-                      <AvatarFallback className="bg-muted text-foreground text-sm font-semibold">
-                        {(booking.passageiroNome || 'P').charAt(0)}
-                      </AvatarFallback>
+                      <AvatarFallback className="bg-muted text-foreground text-sm font-semibold">{(booking.passageiroNome || "P").charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold text-foreground truncate">{booking.passageiroNome || 'Passageiro'}</p>
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-2 ${statusColors[booking.status]}`}>
-                          {booking.status}
-                        </span>
+                        <p className="text-sm font-semibold text-foreground truncate">{booking.passageiroNome || "Passageiro"}</p>
+                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-2 ${statusColors[booking.status]}`}>{booking.status}</span>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" /> {booking.quantidadeVagas} vaga(s)
                         </span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" /> {new Date(booking.dataReserva).toLocaleDateString('pt-BR')}
+                          <Calendar className="w-3 h-3" /> {new Date(booking.dataReserva).toLocaleDateString("pt-BR")}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{booking.trip?.presidioNome}</p>
@@ -89,7 +92,7 @@ const DriverRequests = () => {
               ))}
               {items.length === 0 && (
                 <div className="text-center py-10 text-muted-foreground">
-                  <p className="text-sm">Nenhuma solicitação nesta categoria</p>
+                  <p className="text-sm">Nenhuma solicitacao nesta categoria</p>
                 </div>
               )}
             </TabsContent>
@@ -97,7 +100,7 @@ const DriverRequests = () => {
         </Tabs>
       </div>
 
-      <BottomNav active="trips" isDriver />
+      <BottomNav active="requests" isDriver />
     </div>
   );
 };
