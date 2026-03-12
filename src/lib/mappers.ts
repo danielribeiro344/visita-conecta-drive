@@ -2,6 +2,8 @@ import { Booking, DriverDetail, Prison, Trip, User } from "@/types";
 import { ApiMotorista, ApiPresidio, ApiReserva, ApiUsuario, ApiViagem, api, normalizeReservaStatus, normalizeTripStatus, normalizeUsuarioStatus } from "@/lib/api";
 
 export function toUser(usuario: ApiUsuario): User {
+  const perfis = usuario.perfis ?? (usuario.role ? [usuario.role] : ["PASSAGEIRO"]);
+
   return {
     id: usuario.id,
     nome: usuario.nome,
@@ -9,7 +11,7 @@ export function toUser(usuario: ApiUsuario): User {
     telefone: usuario.telefone,
     cpf: usuario.cpf,
     status: normalizeUsuarioStatus(usuario.status),
-    perfis: usuario.perfis ?? ["PASSAGEIRO"],
+    perfis,
   };
 }
 

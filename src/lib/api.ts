@@ -12,6 +12,7 @@ export interface ApiUsuario {
   senhaHash?: string;
   cpf: string;
   status: number | string;
+  role?: ApiRole;
   emailVerificado?: boolean;
   telefoneVerificado?: boolean;
   perfis?: ApiRole[];

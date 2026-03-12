@@ -52,9 +52,9 @@ const Register = () => {
         senhaHash: senha,
         cpf,
         status: 1,
+        role: selectedRole,
         emailVerificado: false,
         telefoneVerificado: false,
-        perfis: [selectedRole],
       });
 
       const userId = created.id;

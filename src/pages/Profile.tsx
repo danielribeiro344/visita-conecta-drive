@@ -31,41 +31,18 @@ const Profile = () => {
 
   const refreshMutation = useMutation({
     mutationFn: async () => {
-      if (!session?.userId || !userQuery.data) throw new Error("Usuario nao carregado");
-      const updatedUser = await api.updateUsuario(Number(session.userId), {
-        nome: userQuery.data.nome,
-        email: userQuery.data.email,
-        telefone: userQuery.data.telefone,
-        senhaHash: userQuery.data.senhaHash ?? "",
-        cpf: userQuery.data.cpf,
-        status: userQuery.data.status,
-        emailVerificado: userQuery.data.emailVerificado,
-        telefoneVerificado: userQuery.data.telefoneVerificado,
-        perfis: userQuery.data.perfis,
-      });
+      if (!session?.userId) throw new Error("Usuario nao carregado");
 
-      if (isDriver && detail) {
-        await api.updateMotorista(session.userId, {
-          usuarioId: session.userId,
-          cnhNumero: detail.cnhNumero,
-          cnhValidade: detail.cnhValidade,
-          veiculoMarca: detail.veiculoMarca,
-          veiculoModelo: detail.veiculoModelo,
-          veiculoPlaca: detail.veiculoPlaca,
-          aprovado: detail.aprovado,
-          vehicleTypeId: detail.vehicleTypeId,
-          veiculoAno: detail.veiculoAno,
-          veiculoAssentos: detail.veiculoAssentos ?? detail.capacidadeVeiculo,
-          veiculoCor: detail.veiculoCor,
-          capacidadeVeiculo: detail.capacidadeVeiculo,
-        });
+      await queryClient.invalidateQueries({ queryKey: ["usuario", session.userId] });
+
+      if (isDriver) {
+        await queryClient.invalidateQueries({ queryKey: ["motorista", session.userId] });
       }
 
-      return updatedUser;
+      return null;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["usuario", session?.userId] });
-      toast.success("Perfil sincronizado com backend");
+      toast.success("Perfil atualizado com dados do backend");
     },
     onError: (error: Error) => toast.error(error.message),
   });
