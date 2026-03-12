@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
-import { getLocalAccounts, setSession } from "@/lib/session";
+import { getLocalAccounts, setSession, type SessionRole } from "@/lib/session";
 
 const Login = () => {
   const navigate = useNavigate();

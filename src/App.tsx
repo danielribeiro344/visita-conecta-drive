@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -35,7 +35,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <HashRouter>
         <div className="max-w-lg mx-auto min-h-screen bg-background relative">
           <Routes>
             <Route path="/" element={<Onboarding />} />
@@ -57,7 +57,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
-      </BrowserRouter>
+      </HashRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
