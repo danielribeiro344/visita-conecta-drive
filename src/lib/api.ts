@@ -19,11 +19,17 @@ export interface ApiUsuario {
 
 export interface ApiMotorista {
   usuarioId: string;
+  vehicleId?: number;
   cnhNumero: string;
   cnhValidade: string;
   veiculoModelo: string;
   veiculoPlaca: string;
   aprovado: boolean;
+  vehicleTypeId?: number;
+  veiculoMarca?: string;
+  veiculoAno?: number;
+  veiculoAssentos?: number;
+  veiculoCor?: string;
   capacidadeVeiculo?: number;
 }
 
@@ -43,6 +49,7 @@ export interface ApiPresidio {
 export interface ApiViagem {
   id: string;
   motoristaId: string;
+  vehicleId?: number;
   presidioId: string;
   dataSaida: string;
   valor: number;
@@ -65,6 +72,33 @@ export interface ApiErrorPayload {
   message?: string;
   title?: string;
   error?: string;
+  detail?: string;
+  errors?: Record<string, string[] | string>;
+}
+
+function extractBadRequestMessage(payload: ApiErrorPayload | null): string | null {
+  if (!payload) return null;
+
+  const directMessage = payload.message ?? payload.detail ?? payload.error;
+  if (typeof directMessage === "string" && directMessage.trim().length > 0) {
+    return directMessage;
+  }
+
+  if (payload.errors && typeof payload.errors === "object") {
+    const firstError = Object.values(payload.errors)
+      .flatMap((value) => (Array.isArray(value) ? value : [value]))
+      .find((value) => typeof value === "string" && value.trim().length > 0);
+
+    if (firstError) {
+      return firstError;
+    }
+  }
+
+  if (typeof payload.title === "string" && payload.title.trim().length > 0) {
+    return payload.title;
+  }
+
+  return null;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -87,11 +121,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   const text = await response.text();
-  const body = text ? JSON.parse(text) : null;
+  let body: unknown = null;
+
+  if (text) {
+    try {
+      body = JSON.parse(text);
+    } catch {
+      body = text;
+    }
+  }
 
   if (!response.ok) {
-    const payload = (body ?? {}) as ApiErrorPayload;
-    const message = payload.message ?? payload.title ?? payload.error ?? `Erro HTTP ${response.status}`;
+    const payload = typeof body === "object" && body !== null ? (body as ApiErrorPayload) : null;
+    const badRequestMessage = response.status === 400 ? extractBadRequestMessage(payload) ?? (typeof body === "string" ? body : null) : null;
+    const message = badRequestMessage ?? `Erro HTTP ${response.status}`;
     throw new Error(message);
   }
 

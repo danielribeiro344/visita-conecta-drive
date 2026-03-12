@@ -49,9 +49,14 @@ const Profile = () => {
           usuarioId: session.userId,
           cnhNumero: detail.cnhNumero,
           cnhValidade: detail.cnhValidade,
+          veiculoMarca: detail.veiculoMarca,
           veiculoModelo: detail.veiculoModelo,
           veiculoPlaca: detail.veiculoPlaca,
           aprovado: detail.aprovado,
+          vehicleTypeId: detail.vehicleTypeId,
+          veiculoAno: detail.veiculoAno,
+          veiculoAssentos: detail.veiculoAssentos ?? detail.capacidadeVeiculo,
+          veiculoCor: detail.veiculoCor,
           capacidadeVeiculo: detail.capacidadeVeiculo,
         });
       }
@@ -155,8 +160,11 @@ const Profile = () => {
               <h2 className="text-sm font-semibold text-foreground">Veiculo</h2>
             </div>
             <InfoRow label="Modelo" value={detail.veiculoModelo} />
+            <InfoRow label="Marca" value={detail.veiculoMarca ?? "-"} />
             <InfoRow label="Placa" value={maskedPlaca} />
-            <InfoRow label="Capacidade" value={`${detail.capacidadeVeiculo ?? 4} passageiros`} />
+            <InfoRow label="Ano" value={detail.veiculoAno ? String(detail.veiculoAno) : "-"} />
+            <InfoRow label="Cor" value={detail.veiculoCor ?? "-"} />
+            <InfoRow label="Capacidade" value={`${detail.veiculoAssentos ?? detail.capacidadeVeiculo ?? 4} passageiros`} />
             <InfoRow label="CNH" value={maskedCnh} />
             <InfoRow label="Aprovacao" value={detail.aprovado ? "Aprovado" : "Pendente"} />
           </div>

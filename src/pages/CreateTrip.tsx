@@ -34,6 +34,7 @@ const CreateTrip = () => {
     mutationFn: () =>
       api.createViagem({
         motoristaId: Number(session?.userId) ?? 0,
+        vehicleId: motoristaQuery.data?.vehicleId,
         presidioId: prison,
         dataSaida: new Date(`${date}T${time}`).toISOString(),
         valor: Number(price),
@@ -47,7 +48,7 @@ const CreateTrip = () => {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const maxSeats = motoristaQuery.data?.capacidadeVeiculo ?? 4;
+  const maxSeats = motoristaQuery.data?.veiculoAssentos ?? motoristaQuery.data?.capacidadeVeiculo ?? 4;
   const seatsNum = parseInt(seats) || 0;
   const seatsExceeded = seatsNum > maxSeats;
 
@@ -59,6 +60,11 @@ const CreateTrip = () => {
 
     if (!prison || !date || !time || !price || !seats) {
       toast.error("Preencha todos os campos");
+      return;
+    }
+
+    if (!motoristaQuery.data?.vehicleId) {
+      toast.error("Nao foi possivel identificar o veiculo do motorista. Atualize seu perfil e tente novamente.");
       return;
     }
 
