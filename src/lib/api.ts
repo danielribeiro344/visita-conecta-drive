@@ -37,6 +37,7 @@ export interface ApiVehicle {
 }
 
 export interface ApiMotorista {
+  id?: string;
   usuarioId: string;
   vehicleId?: number;
   vehicles?: ApiVehicle[];
@@ -51,6 +52,7 @@ export interface ApiMotorista {
   veiculoAssentos?: number;
   veiculoCor?: string;
   capacidadeVeiculo?: number;
+  viagens?: ApiViagem[];
 }
 
 export interface ApiPresidio {

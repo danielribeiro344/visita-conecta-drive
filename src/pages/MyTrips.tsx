@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, Users, XCircle, ChevronRight } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TripStatus } from "@/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import BottomNav from "@/components/BottomNav";
 import { useAppData } from "@/hooks/useAppData";
 import { getSession } from "@/lib/session";
 import { api } from "@/lib/api";
+import { toTrip } from "@/lib/mappers";
 
 const statusColors: Record<TripStatus, string> = {
   Ativa: "bg-success/10 text-success",
@@ -22,21 +23,51 @@ const MyTrips = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const session = getSession();
-  const { trips } = useAppData();
+  const { prisons } = useAppData();
+
+  const driverQuery = useQuery({
+    queryKey: ["motorista", session?.userId],
+    queryFn: () => api.getMotorista(session?.userId ?? ""),
+    enabled: Boolean(session?.userId),
+  });
+
+  const prisonsById = useMemo(() => {
+    const map = new Map<string, typeof prisons[number]>();
+    prisons.forEach((presidio) => map.set(presidio.id, presidio));
+    return map;
+  }, [prisons]);
+
+  const usersById = useMemo(() => {
+    const map = new Map<string, any>();
+    if (session?.userId && session.userName) {
+      map.set(session.userId, {
+        id: session.userId,
+        nome: session.userName,
+        email: session.email ?? "",
+        telefone: "",
+        cpf: "",
+        status: 1,
+      });
+    }
+    return map;
+  }, [session?.userId, session?.userName, session?.email]);
 
   const cancelMutation = useMutation({
     mutationFn: (tripId: string) => api.deleteViagem(tripId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["viagens"] });
+      if (session?.userId) {
+        queryClient.invalidateQueries({ queryKey: ["motorista", session.userId] });
+      }
       toast.info("Carona cancelada");
     },
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const driverTrips = useMemo(
-    () => trips.filter((t) => t.motoristaId === Number(session?.userId)),
-    [trips, session?.userId]
-  );
+  const driverTrips = useMemo(() => {
+    const viagens = driverQuery.data?.viagens ?? [];
+    return viagens.map((viagem) => toTrip(viagem, usersById, prisonsById));
+  }, [driverQuery.data?.viagens, usersById, prisonsById]);
   const upcoming = driverTrips.filter((t) => t.status === "Ativa");
   const full = driverTrips.filter((t) => t.status === "Lotada");
   const finished = driverTrips.filter((t) => t.status === "Finalizada");
