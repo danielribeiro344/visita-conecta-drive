@@ -16,19 +16,21 @@ export function toUser(usuario: ApiUsuario): User {
 }
 
 export function toDriverDetail(motorista: ApiMotorista): DriverDetail {
-  const capacidadeVeiculo = motorista.veiculoAssentos ?? motorista.capacidadeVeiculo ?? 4;
+  const primaryVehicle = motorista.vehicles?.[0];
+  const capacidadeVeiculo = motorista.veiculoAssentos ?? motorista.capacidadeVeiculo ?? primaryVehicle?.seats ?? 4;
 
   return {
     userId: motorista.usuarioId,
     cnhNumero: motorista.cnhNumero,
     cnhValidade: motorista.cnhValidade,
-    veiculoModelo: motorista.veiculoModelo,
-    veiculoPlaca: motorista.veiculoPlaca,
+    veiculoModelo: motorista.veiculoModelo ?? primaryVehicle?.model ?? primaryVehicle?.brand ?? "",
+    veiculoPlaca: motorista.veiculoPlaca ?? primaryVehicle?.plate ?? "",
+    vehicleId: motorista.vehicleId ?? primaryVehicle?.id,
     vehicleTypeId: motorista.vehicleTypeId,
-    veiculoMarca: motorista.veiculoMarca,
-    veiculoAno: motorista.veiculoAno,
+    veiculoMarca: motorista.veiculoMarca ?? primaryVehicle?.brand,
+    veiculoAno: motorista.veiculoAno ?? primaryVehicle?.year,
     veiculoAssentos: motorista.veiculoAssentos ?? capacidadeVeiculo,
-    veiculoCor: motorista.veiculoCor,
+    veiculoCor: motorista.veiculoCor ?? primaryVehicle?.color,
     capacidadeVeiculo,
     aprovado: Boolean(motorista.aprovado),
   };

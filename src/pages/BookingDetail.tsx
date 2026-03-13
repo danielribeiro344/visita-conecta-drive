@@ -26,6 +26,8 @@ const BookingDetail = () => {
   const trip = trips.find((item) => item.id === bookingData?.viagemId);
   const driver = trip ? usersById.get(trip.motoristaId) : undefined;
   const driverDetail = trip ? motoristas.find((item) => item.usuarioId === trip.motoristaId) : undefined;
+  const primaryVehicle = driverDetail?.vehicles?.[0];
+  const vehicleName = driverDetail?.veiculoModelo ?? primaryVehicle?.model ?? primaryVehicle?.brand ?? "Veiculo";
 
   const [status, setStatus] = useState(bookingData ? normalizeReservaStatus(bookingData.status) : "Pendente");
 
@@ -46,7 +48,8 @@ const BookingDetail = () => {
   });
 
   const total = useMemo(() => (trip ? trip.valor * Number(bookingData?.quantidadeVagas ?? 0) : 0), [trip, bookingData?.quantidadeVagas]);
-  const maskedPlaca = driverDetail?.veiculoPlaca?.replace(/(.{3}).(.*)/, "$1-****") ?? "---";
+  const placa = driverDetail?.veiculoPlaca ?? primaryVehicle?.plate;
+  const maskedPlaca = placa ? placa.replace(/(.{3}).(.*)/, "$1-****") : "---";
 
   if (bookingQuery.isLoading) {
     return (
@@ -98,7 +101,7 @@ const BookingDetail = () => {
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-xl p-3">
             <Car className="w-4 h-4 text-primary" />
-            <span>{driverDetail?.veiculoModelo ?? "Veiculo"}</span>
+            <span>{vehicleName}</span>
             <span className="ml-auto font-medium text-foreground">{maskedPlaca}</span>
           </div>
         </div>

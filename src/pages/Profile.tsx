@@ -86,7 +86,15 @@ const Profile = () => {
     return `${digits.slice(0, 3)}.***.***-${digits.slice(9)}`;
   }, [user?.cpf]);
 
-  const maskedPlaca = detail?.veiculoPlaca ? `${detail.veiculoPlaca.slice(0, 3)}-****` : "";
+  const primaryVehicle = detail?.vehicles?.[0];
+  const veiculoModelo = detail?.veiculoModelo ?? primaryVehicle?.model ?? primaryVehicle?.brand ?? "-";
+  const veiculoMarca = detail?.veiculoMarca ?? primaryVehicle?.brand ?? "-";
+  const veiculoPlaca = detail?.veiculoPlaca ?? primaryVehicle?.plate ?? "";
+  const veiculoAno = detail?.veiculoAno ?? primaryVehicle?.year;
+  const veiculoCor = detail?.veiculoCor ?? primaryVehicle?.color;
+  const veiculoAssentos = detail?.veiculoAssentos ?? detail?.capacidadeVeiculo ?? primaryVehicle?.seats;
+
+  const maskedPlaca = veiculoPlaca ? `${veiculoPlaca.slice(0, 3)}-****` : "";
   const maskedCnh = detail?.cnhNumero ? `${detail.cnhNumero.slice(0, 3)}*****${detail.cnhNumero.slice(-2)}` : "";
 
   if (!user) {
@@ -136,12 +144,12 @@ const Profile = () => {
               <Car className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-semibold text-foreground">Veiculo</h2>
             </div>
-            <InfoRow label="Modelo" value={detail.veiculoModelo} />
-            <InfoRow label="Marca" value={detail.veiculoMarca ?? "-"} />
+            <InfoRow label="Modelo" value={veiculoModelo} />
+            <InfoRow label="Marca" value={veiculoMarca} />
             <InfoRow label="Placa" value={maskedPlaca} />
-            <InfoRow label="Ano" value={detail.veiculoAno ? String(detail.veiculoAno) : "-"} />
-            <InfoRow label="Cor" value={detail.veiculoCor ?? "-"} />
-            <InfoRow label="Capacidade" value={`${detail.veiculoAssentos ?? detail.capacidadeVeiculo ?? 4} passageiros`} />
+            <InfoRow label="Ano" value={veiculoAno ? String(veiculoAno) : "-"} />
+            <InfoRow label="Cor" value={veiculoCor ?? "-"} />
+            <InfoRow label="Capacidade" value={`${veiculoAssentos ?? 4} passageiros`} />
             <InfoRow label="CNH" value={maskedCnh} />
             <InfoRow label="Aprovacao" value={detail.aprovado ? "Aprovado" : "Pendente"} />
           </div>

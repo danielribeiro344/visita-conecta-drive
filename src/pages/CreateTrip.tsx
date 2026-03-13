@@ -30,11 +30,14 @@ const CreateTrip = () => {
     enabled: Boolean(session?.userId),
   });
 
+  const primaryVehicle = motoristaQuery.data?.vehicles?.[0];
+  const vehicleId = motoristaQuery.data?.vehicleId ?? primaryVehicle?.id;
+
   const createMutation = useMutation({
     mutationFn: () =>
       api.createViagem({
         motoristaId: Number(session?.userId) ?? 0,
-        vehicleId: motoristaQuery.data?.vehicleId,
+        vehicleId,
         presidioId: prison,
         dataSaida: new Date(`${date}T${time}`).toISOString(),
         valor: Number(price),
@@ -48,7 +51,10 @@ const CreateTrip = () => {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const maxSeats = motoristaQuery.data?.veiculoAssentos ?? motoristaQuery.data?.capacidadeVeiculo ?? 4;
+  const maxSeats =
+    motoristaQuery.data?.veiculoAssentos ?? motoristaQuery.data?.capacidadeVeiculo ?? primaryVehicle?.seats ?? 4;
+  const vehicleName =
+    motoristaQuery.data?.veiculoModelo ?? primaryVehicle?.model ?? primaryVehicle?.brand ?? "Veiculo";
   const seatsNum = parseInt(seats) || 0;
   const seatsExceeded = seatsNum > maxSeats;
 
@@ -63,7 +69,7 @@ const CreateTrip = () => {
       return;
     }
 
-    if (!motoristaQuery.data?.vehicleId) {
+    if (!vehicleId) {
       toast.error("Nao foi possivel identificar o veiculo do motorista. Atualize seu perfil e tente novamente.");
       return;
     }
@@ -74,7 +80,7 @@ const CreateTrip = () => {
     }
 
     if (seatsExceeded) {
-      toast.error(`Seu veiculo (${motoristaQuery.data?.veiculoModelo ?? ""}) suporta no maximo ${maxSeats} passageiros.`);
+      toast.error(`Seu veiculo (${vehicleName}) suporta no maximo ${maxSeats} passageiros.`);
       return;
     }
 
@@ -142,7 +148,7 @@ const CreateTrip = () => {
                 {seatsExceeded ? "Quantidade excede a capacidade do veiculo" : "Capacidade do veiculo"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {motoristaQuery.data?.veiculoModelo ?? "Veiculo"} - max. <strong>{maxSeats}</strong> passageiros
+                {vehicleName} - max. <strong>{maxSeats}</strong> passageiros
               </p>
             </div>
           </div>

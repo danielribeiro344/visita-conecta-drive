@@ -18,9 +18,28 @@ export interface ApiUsuario {
   perfis?: ApiRole[];
 }
 
+export interface ApiVehicle {
+  id: number;
+  driverId: number;
+  vehicleTypeId?: number;
+  model: string;
+  brand: string;
+  year: number;
+  plate: string;
+  seats: number;
+  color: string;
+  createdAt?: string;
+  // Optional relations (can be null in responses)
+  driver?: unknown;
+  vehicleType?: unknown;
+  documents?: unknown[];
+  rides?: unknown[];
+}
+
 export interface ApiMotorista {
   usuarioId: string;
   vehicleId?: number;
+  vehicles?: ApiVehicle[];
   cnhNumero: string;
   cnhValidade: string;
   veiculoModelo: string;
