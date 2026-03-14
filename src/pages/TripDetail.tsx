@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Users, MapPin, MessageCircle, Star, RefreshCcw } from "lucide-react";
@@ -8,6 +9,7 @@ import { BookingStatus } from "@/types";
 import { toast } from "sonner";
 import { useAppData } from "@/hooks/useAppData";
 import { api } from "@/lib/api";
+import { toTrip } from "@/lib/mappers";
 
 const statusColors: Record<BookingStatus, string> = {
   Pendente: "bg-warning/10 text-warning",
@@ -20,15 +22,27 @@ const TripDetail = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { bookings, trips } = useAppData();
-  const trip = trips.find((item) => item.id === id);
-  const tripBookings = bookings.filter((b) => b.viagemId === id);
+  const { bookings, trips, usersById, prisons } = useAppData();
+
+  const prisonsById = useMemo(() => {
+    const map = new Map<string, typeof prisons[number]>();
+    prisons.forEach((presidio) => map.set(presidio.id, presidio));
+    return map;
+  }, [prisons]);
 
   const tripApiQuery = useQuery({
     queryKey: ["viagem", id],
     queryFn: () => api.getViagem(id),
     enabled: Boolean(id),
   });
+
+  const tripFromApi = useMemo(() => {
+    if (!tripApiQuery.data) return undefined;
+    return toTrip(tripApiQuery.data, usersById, prisonsById);
+  }, [tripApiQuery.data, usersById, prisonsById]);
+
+  const trip = trips.find((item) => item.id === id) ?? tripFromApi;
+  const tripBookings = bookings.filter((b) => b.viagemId === id);
 
   const syncMutation = useMutation({
     mutationFn: async () => {
@@ -51,6 +65,14 @@ const TripDetail = () => {
   });
 
   if (!trip) {
+    if (tripApiQuery.isLoading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <p className="text-muted-foreground">Carregando carona...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Carona nao encontrada</p>
