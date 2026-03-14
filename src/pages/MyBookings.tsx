@@ -16,12 +16,34 @@ const statusColors: Record<BookingStatus, string> = {
 const MyBookings = () => {
   const navigate = useNavigate();
   const session = getSession();
-  const { bookings } = useAppData();
+  const { bookings, isLoading, error } = useAppData();
 
   const passengerBookings = useMemo(
     () => bookings.filter((booking) => booking.passageiroId === session?.userId),
     [bookings, session?.userId],
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background pb-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando reservas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background pb-24 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Erro ao carregar reservas</p>
+          <p className="text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
