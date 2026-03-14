@@ -14,10 +14,15 @@ interface ChatMessage {
   timestamp: string;
 }
 
-const CHAT_KEY = "visita_conecta_chat";
+function getChatKey(user1: string, user2: string): string {
+  // Ordena os IDs para criar uma chave consistente independente da ordem
+  const [id1, id2] = [user1, user2].sort();
+  return `visita_conecta_chat_${id1}_${id2}`;
+}
 
-function readMessages(): ChatMessage[] {
-  const raw = localStorage.getItem(CHAT_KEY);
+function readMessages(user1: string, user2: string): ChatMessage[] {
+  const key = getChatKey(user1, user2);
+  const raw = localStorage.getItem(key);
   if (!raw) return [];
 
   try {
@@ -27,8 +32,9 @@ function readMessages(): ChatMessage[] {
   }
 }
 
-function persistMessages(messages: ChatMessage[]) {
-  localStorage.setItem(CHAT_KEY, JSON.stringify(messages));
+function persistMessages(user1: string, user2: string, messages: ChatMessage[]) {
+  const key = getChatKey(user1, user2);
+  localStorage.setItem(key, JSON.stringify(messages));
 }
 
 const Chat = () => {
@@ -42,7 +48,11 @@ const Chat = () => {
   const contact = usersById.get(contactId);
   const currentUser = usersById.get(currentUserId);
 
-  const [allMessages, setAllMessages] = useState<ChatMessage[]>(() => readMessages());
+  // Fallback para dados da sessão se não encontrar nos usersById
+  const contactName = contact?.nome || searchParams.get("contactName") || "Contato";
+  const currentUserName = currentUser?.nome || searchParams.get("asName") || "Você";
+
+  const [allMessages, setAllMessages] = useState<ChatMessage[]>(() => readMessages(currentUserId, contactId));
   const messages = useMemo(
     () =>
       allMessages.filter(
@@ -57,16 +67,20 @@ const Chat = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setAllMessages(readMessages(currentUserId, contactId));
+  }, [currentUserId, contactId]);
+
+  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages]);
 
   const handleSend = () => {
-    if (!newMessage.trim() || !currentUser) return;
+    if (!newMessage.trim()) return;
 
     const msg: ChatMessage = {
       id: `msg-${Date.now()}`,
       senderId: currentUserId,
-      senderNome: currentUser.nome,
+      senderNome: currentUserName,
       receiverId: contactId,
       message: newMessage.trim(),
       timestamp: new Date().toISOString(),
@@ -74,7 +88,7 @@ const Chat = () => {
 
     const next = [...allMessages, msg];
     setAllMessages(next);
-    persistMessages(next);
+    persistMessages(currentUserId, contactId, next);
     setNewMessage("");
   };
 
@@ -92,10 +106,10 @@ const Chat = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <Avatar className="w-10 h-10">
-          <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">{(contact?.nome || "?").split(" ").map((n) => n[0]).join("").slice(0, 2)}</AvatarFallback>
+          <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">{(contactName || "?").split(" ").map((n) => n[0]).join("").slice(0, 2)}</AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{contact?.nome ?? "Contato"}</p>
+          <p className="text-sm font-semibold text-foreground truncate">{contactName}</p>
           <p className="text-xs text-muted-foreground">Online</p>
         </div>
       </div>

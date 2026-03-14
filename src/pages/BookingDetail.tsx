@@ -154,7 +154,7 @@ const BookingDetail = () => {
 
         <div className="space-y-3">
           {status === "Confirmada" && (
-            <Button onClick={() => navigate(`/chat?contact=${trip.motoristaId}&as=${bookingData.passageiroId}`)} className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
+            <Button onClick={() => navigate(`/chat?contact=${trip.motoristaId}&as=${bookingData.passageiroId}&contactName=${encodeURIComponent(trip?.motoristaNome || 'Motorista')}&asName=${encodeURIComponent(bookingData.passageiroNome || 'Passageiro')}`)} className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
               <MessageCircle className="w-5 h-5 mr-2" /> Conversar com Motorista
             </Button>
           )}

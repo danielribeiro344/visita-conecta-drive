@@ -143,7 +143,7 @@ const TripDetail = () => {
                     </div>
                   </div>
                   {booking.status === "Confirmada" && (
-                    <Button size="sm" variant="outline" className="rounded-xl shrink-0" onClick={() => navigate(`/chat?contact=${booking.passageiroId}&as=${trip.motoristaId}`)}>
+                    <Button size="sm" variant="outline" className="rounded-xl shrink-0" onClick={() => navigate(`/chat?contact=${booking.passageiroId}&as=${trip.motoristaId}&contactName=${encodeURIComponent(booking.passageiroNome || 'Passageiro')}&asName=${encodeURIComponent(trip.motoristaNome)}`)}>
                       <MessageCircle className="w-4 h-4" />
                     </Button>
                   )}

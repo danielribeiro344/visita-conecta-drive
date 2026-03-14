@@ -144,7 +144,7 @@ const DriverRequestDetail = () => {
           )}
 
           {status === "Confirmada" && (
-            <Button onClick={() => navigate(`/chat?contact=${raw.passageiroId}&as=${trip?.motoristaId}`)} className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
+            <Button onClick={() => navigate(`/chat?contact=${raw.passageiroId}&as=${trip?.motoristaId}&contactName=${encodeURIComponent(passenger?.nome || 'Passageiro')}&asName=${encodeURIComponent(trip?.motoristaNome || 'Motorista')}`)} className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold">
               <MessageCircle className="w-5 h-5 mr-2" /> Enviar mensagem
             </Button>
           )}
