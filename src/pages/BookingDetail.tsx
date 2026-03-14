@@ -8,13 +8,20 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { api, normalizeReservaStatus } from "@/lib/api";
 import { useAppData } from "@/hooks/useAppData";
+import { toTrip } from "@/lib/mappers";
 
 const BookingDetail = () => {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { usersById, motoristas, trips } = useAppData();
+  const { usersById, motoristas, trips, prisons } = useAppData();
+
+  const prisonsById = useMemo(() => {
+    const map = new Map<string, typeof prisons[number]>();
+    prisons.forEach((presidio) => map.set(presidio.id, presidio));
+    return map;
+  }, [prisons]);
 
   const bookingQuery = useQuery({
     queryKey: ["reserva", id],
@@ -22,8 +29,19 @@ const BookingDetail = () => {
     enabled: Boolean(id),
   });
 
+  const tripApiQuery = useQuery({
+    queryKey: ["viagem", bookingData?.viagemId],
+    queryFn: () => api.getViagem(bookingData?.viagemId ?? ""),
+    enabled: Boolean(bookingData?.viagemId),
+  });
+
+  const tripFromApi = useMemo(() => {
+    if (!tripApiQuery.data) return undefined;
+    return toTrip(tripApiQuery.data, usersById, prisonsById);
+  }, [tripApiQuery.data, usersById, prisonsById]);
+
   const bookingData = bookingQuery.data;
-  const trip = trips.find((item) => item.id === bookingData?.viagemId);
+  const trip = trips.find((item) => item.id === bookingData?.viagemId) ?? tripFromApi;
   const driver = trip ? usersById.get(trip.motoristaId) : undefined;
   const driverDetail = trip ? motoristas.find((item) => item.usuarioId === trip.motoristaId) : undefined;
   const primaryVehicle = driverDetail?.vehicles?.[0];

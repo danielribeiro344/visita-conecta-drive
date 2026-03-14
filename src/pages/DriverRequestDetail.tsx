@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Star, MapPin, MessageCircle, CheckCircle, XCircle, Shield } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -8,13 +8,20 @@ import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, normalizeReservaStatus } from "@/lib/api";
 import { useAppData } from "@/hooks/useAppData";
+import { toTrip } from "@/lib/mappers";
 
 const DriverRequestDetail = () => {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { trips, usersById } = useAppData();
+  const { trips, usersById, prisons } = useAppData();
+
+  const prisonsById = useMemo(() => {
+    const map = new Map<string, typeof prisons[number]>();
+    prisons.forEach((presidio) => map.set(presidio.id, presidio));
+    return map;
+  }, [prisons]);
 
   const reservaQuery = useQuery({
     queryKey: ["reserva", id],
@@ -22,8 +29,19 @@ const DriverRequestDetail = () => {
     enabled: Boolean(id),
   });
 
+  const tripApiQuery = useQuery({
+    queryKey: ["viagem", reservaQuery.data?.viagemId],
+    queryFn: () => api.getViagem(reservaQuery.data?.viagemId ?? ""),
+    enabled: Boolean(reservaQuery.data?.viagemId),
+  });
+
+  const tripFromApi = useMemo(() => {
+    if (!tripApiQuery.data) return undefined;
+    return toTrip(tripApiQuery.data, usersById, prisonsById);
+  }, [tripApiQuery.data, usersById, prisonsById]);
+
   const raw = reservaQuery.data;
-  const trip = raw ? trips.find((item) => item.id === raw.viagemId) : undefined;
+  const trip = raw ? (trips.find((item) => item.id === raw.viagemId) ?? tripFromApi) : undefined;
   const passenger = raw ? usersById.get(raw.passageiroId) : undefined;
 
   const [status, setStatus] = useState(raw ? normalizeReservaStatus(raw.status) : "Pendente");

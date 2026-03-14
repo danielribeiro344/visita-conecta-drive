@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Minus, Plus, Calendar, Users, MapPin } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAppData } from "@/hooks/useAppData";
 import { api } from "@/lib/api";
 import { getSession } from "@/lib/session";
+import { toTrip } from "@/lib/mappers";
 
 const BookTrip = () => {
   const { id = "" } = useParams();
@@ -15,8 +16,26 @@ const BookTrip = () => {
   const queryClient = useQueryClient();
   const session = getSession();
 
-  const { trips } = useAppData();
-  const trip = trips.find((item) => item.id === id);
+  const { trips, usersById, prisons } = useAppData();
+
+  const prisonsById = useMemo(() => {
+    const map = new Map<string, typeof prisons[number]>();
+    prisons.forEach((presidio) => map.set(presidio.id, presidio));
+    return map;
+  }, [prisons]);
+
+  const tripApiQuery = useQuery({
+    queryKey: ["viagem", id],
+    queryFn: () => api.getViagem(id),
+    enabled: Boolean(id),
+  });
+
+  const tripFromApi = useMemo(() => {
+    if (!tripApiQuery.data) return undefined;
+    return toTrip(tripApiQuery.data, usersById, prisonsById);
+  }, [tripApiQuery.data, usersById, prisonsById]);
+
+  const trip = trips.find((item) => item.id === id) ?? tripFromApi;
   const [quantity, setQuantity] = useState(1);
 
   const createBookingMutation = useMutation({
@@ -35,6 +54,14 @@ const BookTrip = () => {
   });
 
   if (!trip || trip.status !== "Ativa") {
+    if (tripApiQuery.isLoading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <p className="text-muted-foreground">Carregando carona...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Carona nao disponivel</p>
