@@ -69,7 +69,7 @@ const BookingDetail = () => {
   const placa = driverDetail?.veiculoPlaca ?? primaryVehicle?.plate;
   const maskedPlaca = placa ? placa.replace(/(.{3}).(.*)/, "$1-****") : "---";
 
-  if (bookingQuery.isLoading) {
+  if (bookingQuery.isLoading || tripApiQuery.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Carregando reserva...</p>
@@ -77,10 +77,18 @@ const BookingDetail = () => {
     );
   }
 
-  if (!bookingData || !trip) {
+  if (!bookingData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Reserva nao encontrada</p>
+      </div>
+    );
+  }
+
+  if (!trip) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Viagem nao encontrada</p>
       </div>
     );
   }

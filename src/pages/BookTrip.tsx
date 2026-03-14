@@ -42,7 +42,7 @@ const BookTrip = () => {
     mutationFn: () =>
       api.createReserva({
         viagemId: id,
-        passageiroId: Number(session?.userId) ?? 0,
+        passageiroId: session?.userId ?? "",
         quantidadeVagas: quantity,
       }),
     onSuccess: () => {

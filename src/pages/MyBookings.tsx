@@ -19,7 +19,7 @@ const MyBookings = () => {
   const { bookings } = useAppData();
 
   const passengerBookings = useMemo(
-    () => bookings.filter((booking) => booking.passageiroId === Number(session?.userId)),
+    () => bookings.filter((booking) => booking.passageiroId === session?.userId),
     [bookings, session?.userId],
   );
 
