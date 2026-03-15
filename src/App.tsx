@@ -20,6 +20,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
+import GlobalLoadingBar from "./components/GlobalLoadingBar";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ const App = () => (
       <Sonner />
       <HashRouter>
         <div className="max-w-lg mx-auto min-h-screen bg-background relative">
+          <GlobalLoadingBar />
           <Routes>
             <Route path="/" element={<Onboarding />} />
             <Route path="/login" element={<Login />} />

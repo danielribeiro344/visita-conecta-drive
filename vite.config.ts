@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       "/backend": {
-        target: "https://erh4972xsh.execute-api.us-east-1.amazonaws.com",
+        target: "https://bff-bpis-caronas.onrender.com",
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/backend/, ""),
