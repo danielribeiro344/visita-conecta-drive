@@ -4,6 +4,7 @@ import { ApiMotorista, ApiPresidio, ApiReserva, ApiUsuario, ApiViagem, api, norm
 export function toUser(usuario: ApiUsuario): User {
   const perfis = usuario.perfis ?? (usuario.role ? [usuario.role] : ["PASSAGEIRO"]);
 
+  
   return {
     id: usuario.id,
     nome: usuario.nome,
