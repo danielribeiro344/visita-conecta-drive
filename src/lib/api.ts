@@ -1,11 +1,12 @@
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
   "https://bff-bpis-caronas.onrender.com";
-  
+
 
 import { getSession } from "./session";
 
 export type ApiRole = "ADMIN" | "PASSAGEIRO" | "MOTORISTA" | "MODERADOR";
+
 
 export interface ApiUsuario {
   id: string;
