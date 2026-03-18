@@ -1,37 +1,25 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Clock, FileText, ShieldCheck, ExternalLink } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api } from "@/lib/api";
-import { toPrison } from "@/lib/mappers";
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Clock, FileText, ShieldCheck, ExternalLink } from 'lucide-react';
+import { mockPrisons } from '@/data/mockData';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const PrisonDetail = () => {
-  const { id = "" } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-
-  const prisonQuery = useQuery({
-    queryKey: ["presidio", id],
-    queryFn: () => api.getPresidio(id),
-    enabled: Boolean(id),
-  });
-
-  const prison = prisonQuery.data ? toPrison(prisonQuery.data) : null;
-
-  if (prisonQuery.isLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background">Carregando...</div>;
-  }
+  const prison = mockPrisons.find(p => p.id === id);
 
   if (!prison) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Presidio nao encontrado</p>
+        <p className="text-muted-foreground">Presídio não encontrado</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background pb-8">
+      {/* Header */}
       <div className="gradient-primary px-6 pt-12 pb-6 rounded-b-3xl">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-primary-foreground/10">
@@ -39,20 +27,23 @@ const PrisonDetail = () => {
           </button>
           <h1 className="text-lg font-bold text-primary-foreground flex-1">{prison.nome}</h1>
         </div>
-        <p className="text-primary-foreground/60 text-sm">
-          {prison.cidade}, {prison.estado}
-        </p>
+        <p className="text-primary-foreground/60 text-sm">{prison.cidade}, {prison.estado}</p>
         <div className="flex items-center gap-2 mt-3 bg-primary-foreground/10 rounded-xl px-3 py-2 w-fit">
           <Clock className="w-4 h-4 text-primary-foreground/70" />
           <span className="text-sm text-primary-foreground/80">{prison.horarioVisita}</span>
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="px-6 mt-6">
+      {/* Tabs */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="px-6 mt-6"
+      >
         <Tabs defaultValue="info" className="w-full">
           <TabsList className="w-full bg-muted rounded-2xl h-12 p-1">
             <TabsTrigger value="info" className="flex-1 rounded-xl text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm">
-              Informacoes
+              Informações
             </TabsTrigger>
             <TabsTrigger value="rules" className="flex-1 rounded-xl text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm">
               Regras
@@ -63,24 +54,42 @@ const PrisonDetail = () => {
           </TabsList>
 
           <TabsContent value="info" className="mt-4 space-y-4">
-            <InfoSection icon={<FileText className="w-4 h-4" />} title="Documentos exigidos" items={prison.requisitosDocumentos} />
+            <InfoSection
+              icon={<FileText className="w-4 h-4" />}
+              title="Documentos exigidos"
+              items={prison.requisitosDocumentos}
+            />
             <div className="bg-card rounded-2xl p-4 shadow-card">
-              <p className="text-xs text-muted-foreground mb-1">Ultima atualizacao</p>
-              <p className="text-sm font-medium text-foreground">{new Date(prison.ultimaAtualizacao).toLocaleDateString("pt-BR")}</p>
+              <p className="text-xs text-muted-foreground mb-1">Última atualização</p>
+              <p className="text-sm font-medium text-foreground">
+                {new Date(prison.ultimaAtualizacao).toLocaleDateString('pt-BR')}
+              </p>
             </div>
-            {prison.normasReferencia && (
-              <a href={prison.normasReferencia} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary font-medium">
-                <ExternalLink className="w-4 h-4" /> Ver norma oficial
-              </a>
-            )}
+            <a
+              href={prison.normasReferencia}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-primary font-medium"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Ver norma oficial
+            </a>
           </TabsContent>
 
           <TabsContent value="rules" className="mt-4">
-            <InfoSection icon={<ShieldCheck className="w-4 h-4" />} title="Regras de vestimenta" items={prison.regrasVestimenta} />
+            <InfoSection
+              icon={<ShieldCheck className="w-4 h-4" />}
+              title="Regras de vestimenta"
+              items={prison.regrasVestimenta}
+            />
           </TabsContent>
 
           <TabsContent value="items" className="mt-4">
-            <InfoSection icon={<ShieldCheck className="w-4 h-4" />} title="Itens permitidos" items={prison.itensPermitidos} />
+            <InfoSection
+              icon={<ShieldCheck className="w-4 h-4" />}
+              title="Itens permitidos"
+              items={prison.itensPermitidos}
+            />
           </TabsContent>
         </Tabs>
       </motion.div>

@@ -1,49 +1,19 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Calendar, Users, ChevronRight } from "lucide-react";
-import { BookingStatus } from "@/types";
-import BottomNav from "@/components/BottomNav";
-import { useAppData } from "@/hooks/useAppData";
-import { getSession } from "@/lib/session";
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Calendar, Users, ChevronRight } from 'lucide-react';
+import { mockBookings } from '@/data/mockData';
+import { BookingStatus } from '@/types';
+import BottomNav from '@/components/BottomNav';
 
 const statusColors: Record<BookingStatus, string> = {
-  Pendente: "bg-warning/10 text-warning",
-  Confirmada: "bg-success/10 text-success",
-  Cancelada: "bg-destructive/10 text-destructive",
+  Pendente: 'bg-warning/10 text-warning',
+  Confirmada: 'bg-success/10 text-success',
+  Cancelada: 'bg-destructive/10 text-destructive',
 };
 
 const MyBookings = () => {
   const navigate = useNavigate();
-  const session = getSession();
-  const { bookings, isLoading, error } = useAppData();
-
-  const passengerBookings = useMemo(
-    () => bookings.filter((booking) => booking.passageiroId === session?.userId),
-    [bookings, session?.userId],
-  );
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background pb-24 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando reservas...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background pb-24 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-4">Erro ao carregar reservas</p>
-          <p className="text-muted-foreground">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
+  const passengerBookings = mockBookings.filter(b => b.passageiroId === 'u1');
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -61,13 +31,15 @@ const MyBookings = () => {
               className="w-full text-left bg-card rounded-2xl p-4 shadow-card"
             >
               <div className="flex items-start justify-between mb-3">
-                <p className="text-sm font-semibold text-foreground">{booking.trip?.presidioNome ?? "Sem viagem"}</p>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColors[booking.status]}`}>{booking.status}</span>
+                <p className="text-sm font-semibold text-foreground">{booking.trip?.presidioNome}</p>
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColors[booking.status]}`}>
+                  {booking.status}
+                </span>
               </div>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
-                  {booking.trip && new Date(booking.trip.dataSaida).toLocaleDateString("pt-BR")}
+                  {booking.trip && new Date(booking.trip.dataSaida).toLocaleDateString('pt-BR')}
                 </span>
                 <span className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5" />
@@ -75,16 +47,18 @@ const MyBookings = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                <p className="text-xs text-muted-foreground">Motorista: {booking.trip?.motoristaNome}</p>
+                <p className="text-xs text-muted-foreground">
+                  Motorista: {booking.trip?.motoristaNome}
+                </p>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-primary">R$ {booking.trip ? (booking.trip.valor * booking.quantidadeVagas).toFixed(2) : "0.00"}</p>
+                  <p className="text-sm font-bold text-primary">
+                    R$ {booking.trip ? (booking.trip.valor * booking.quantidadeVagas).toFixed(2) : '0.00'}
+                  </p>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
             </motion.button>
           ))}
-
-          {passengerBookings.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Voce ainda nao possui reservas.</p>}
         </div>
       </div>
 

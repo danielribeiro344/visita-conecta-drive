@@ -1,70 +1,21 @@
-import { useState, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Minus, Plus, Calendar, Users, MapPin } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { useAppData } from "@/hooks/useAppData";
-import { api } from "@/lib/api";
-import { getSession } from "@/lib/session";
-import { toTrip } from "@/lib/mappers";
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Minus, Plus, Calendar, Users, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { mockTrips } from '@/data/mockData';
+import { toast } from 'sonner';
 
 const BookTrip = () => {
-  const { id = "" } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const session = getSession();
-
-  const { trips, usersById, prisons } = useAppData();
-
-  const prisonsById = useMemo(() => {
-    const map = new Map<string, typeof prisons[number]>();
-    prisons.forEach((presidio) => map.set(presidio.id, presidio));
-    return map;
-  }, [prisons]);
-
-  const tripApiQuery = useQuery({
-    queryKey: ["viagem", id],
-    queryFn: () => api.getViagem(id),
-    enabled: Boolean(id),
-  });
-
-  const tripFromApi = useMemo(() => {
-    if (!tripApiQuery.data) return undefined;
-    return toTrip(tripApiQuery.data, usersById, prisonsById);
-  }, [tripApiQuery.data, usersById, prisonsById]);
-
-  const trip = trips.find((item) => item.id === id) ?? tripFromApi;
+  const trip = mockTrips.find(t => t.id === id);
   const [quantity, setQuantity] = useState(1);
 
-  const createBookingMutation = useMutation({
-    mutationFn: () =>
-      api.createReserva({
-        viagemId: id,
-        passageiroId: session?.userId ?? "",
-        quantidadeVagas: quantity,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reservas"] });
-      toast.success("Reserva realizada com sucesso");
-      navigate("/my-bookings");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  if (!trip || trip.status !== "Ativa") {
-    if (tripApiQuery.isLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <p className="text-muted-foreground">Carregando carona...</p>
-        </div>
-      );
-    }
-
+  if (!trip || trip.status !== 'Ativa') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Carona nao disponivel</p>
+        <p className="text-muted-foreground">Carona não disponível</p>
       </div>
     );
   }
@@ -73,13 +24,10 @@ const BookTrip = () => {
   const total = trip.valor * quantity;
 
   const handleBook = () => {
-    if (!session?.userId) {
-      toast.error("Faca login novamente");
-      navigate("/login");
-      return;
-    }
-
-    createBookingMutation.mutate();
+    toast.success('Reserva realizada com sucesso!', {
+      description: `${quantity} vaga(s) reservada(s) — Total: R$ ${total.toFixed(2)}`,
+    });
+    navigate('/my-bookings');
   };
 
   return (
@@ -101,7 +49,7 @@ const BookTrip = () => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {new Date(trip.dataSaida).toLocaleDateString("pt-BR")} - {trip.horaSaida}
+              {new Date(trip.dataSaida).toLocaleDateString('pt-BR')} • {trip.horaSaida}
             </span>
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
@@ -130,15 +78,13 @@ const BookTrip = () => {
               <p className="text-xs text-accent-foreground/60 uppercase tracking-wide">Valor total</p>
               <p className="text-2xl font-bold text-accent-foreground">R$ {total.toFixed(2)}</p>
             </div>
-            <p className="text-sm text-accent-foreground/60">
-              {quantity}x R$ {trip.valor.toFixed(2)}
-            </p>
+            <p className="text-sm text-accent-foreground/60">{quantity}x R$ {trip.valor.toFixed(2)}</p>
           </div>
         </div>
       </motion.div>
 
       <div className="px-6 pb-8 safe-bottom">
-        <Button onClick={handleBook} disabled={createBookingMutation.isPending} className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground">
+        <Button onClick={handleBook} className="w-full h-14 text-base font-semibold rounded-2xl gradient-primary text-primary-foreground">
           Confirmar reserva
         </Button>
       </div>

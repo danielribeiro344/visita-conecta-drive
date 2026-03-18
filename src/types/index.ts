@@ -24,12 +24,6 @@ export interface DriverDetail {
   cnhValidade: string;
   veiculoModelo: string;
   veiculoPlaca: string;
-  vehicleId?: number;
-  vehicleTypeId?: number;
-  veiculoMarca?: string;
-  veiculoAno?: number;
-  veiculoAssentos?: number;
-  veiculoCor?: string;
   capacidadeVeiculo: number;
   aprovado: boolean;
 }
