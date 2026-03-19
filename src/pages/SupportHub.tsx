@@ -80,11 +80,6 @@ const SupportHub = () => {
                 <svc.icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${svc.labelColor}`}>
-                    {svc.label}
-                  </span>
-                </div>
                 <p className="text-sm font-semibold text-foreground">{svc.title}</p>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{svc.description}</p>
               </div>
