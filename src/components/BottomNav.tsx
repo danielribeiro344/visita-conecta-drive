@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { Home, Ticket, PlusCircle, MapPin, User, Bell, Inbox } from 'lucide-react';
+import { Home, Ticket, PlusCircle, MapPin, User, Bell, Inbox, HeartHandshake } from 'lucide-react';
 
 interface BottomNavProps {
-  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile' | 'notifications' | 'requests';
+  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile' | 'notifications' | 'requests' | 'support';
   isDriver?: boolean;
 }
 
