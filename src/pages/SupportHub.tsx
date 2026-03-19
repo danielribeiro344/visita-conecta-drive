@@ -10,8 +10,6 @@ const services = [
     id: 'seap',
     icon: MapPin,
     color: 'bg-destructive/10 text-destructive',
-    label: 'PRIORIDADE MÁXIMA',
-    labelColor: 'bg-destructive/10 text-destructive',
     title: 'SEAP RJ — Visitas e Presídios',
     description: 'Dias de visita, regras, localização do preso, documentos exigidos',
     path: '/support/seap',
@@ -20,8 +18,6 @@ const services = [
     id: 'tjrj',
     icon: FileText,
     color: 'bg-destructive/10 text-destructive',
-    label: 'PRIORIDADE MÁXIMA',
-    labelColor: 'bg-destructive/10 text-destructive',
     title: 'Consulta de Processo (TJRJ)',
     description: 'Progressão de regime, audiências, alvará de soltura, decisões judiciais',
     path: '/support/tjrj',
@@ -30,8 +26,6 @@ const services = [
     id: 'mprj',
     icon: AlertTriangle,
     color: 'bg-warning/10 text-warning',
-    label: 'PRIORIDADE ALTA',
-    labelColor: 'bg-warning/10 text-warning',
     title: 'Denunciar Abuso (MPRJ)',
     description: 'Agressão, falta de atendimento médico, corrupção, cobrança ilegal',
     path: '/support/mprj',
@@ -40,8 +34,6 @@ const services = [
     id: 'cras',
     icon: Users,
     color: 'bg-info/10 text-info',
-    label: 'APOIO SOCIAL',
-    labelColor: 'bg-info/10 text-info',
     title: 'Assistência Social (CRAS)',
     description: 'Cadastro Único, Bolsa Família, apoio psicológico, assistência familiar',
     path: '/support/cras',
@@ -50,8 +42,6 @@ const services = [
     id: 'pnaisp',
     icon: HeartPulse,
     color: 'bg-secondary/10 text-secondary',
-    label: 'SAÚDE',
-    labelColor: 'bg-secondary/10 text-secondary',
     title: 'Saúde no Sistema Prisional (PNAISP)',
     description: 'Atendimento médico, odontologia, medicamentos, saúde mental',
     path: '/support/pnaisp',
@@ -90,11 +80,6 @@ const SupportHub = () => {
                 <svc.icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${svc.labelColor}`}>
-                    {svc.label}
-                  </span>
-                </div>
                 <p className="text-sm font-semibold text-foreground">{svc.title}</p>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{svc.description}</p>
               </div>
