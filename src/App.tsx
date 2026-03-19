@@ -19,6 +19,8 @@ import DriverRequestDetail from "./pages/DriverRequestDetail";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Chat from "./pages/Chat";
+import SupportHub from "./pages/SupportHub";
+import SupportDetail from "./pages/SupportDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
