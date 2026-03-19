@@ -33,6 +33,9 @@ export interface Prison {
   nome: string;
   cidade: string;
   estado: string;
+  endereco?: string;
+  telefone?: string;
+  email?: string;
   horarioVisita: string;
   requisitosDocumentos: string[];
   itensPermitidos: string[];

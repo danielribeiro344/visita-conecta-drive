@@ -19,6 +19,8 @@ import DriverRequestDetail from "./pages/DriverRequestDetail";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Chat from "./pages/Chat";
+import SupportHub from "./pages/SupportHub";
+import SupportDetail from "./pages/SupportDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +49,8 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/support" element={<SupportHub />} />
+            <Route path="/support/:type" element={<SupportDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

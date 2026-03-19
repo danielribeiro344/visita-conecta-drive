@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, FileText, ShieldCheck, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Clock, FileText, ShieldCheck, ExternalLink, Phone, Mail, MapPin } from 'lucide-react';
 import { mockPrisons } from '@/data/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -28,10 +28,32 @@ const PrisonDetail = () => {
           <h1 className="text-lg font-bold text-primary-foreground flex-1">{prison.nome}</h1>
         </div>
         <p className="text-primary-foreground/60 text-sm">{prison.cidade}, {prison.estado}</p>
+        {prison.endereco && (
+          <div className="flex items-start gap-2 mt-2 text-primary-foreground/70 text-xs">
+            <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <span>{prison.endereco}</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 mt-3 bg-primary-foreground/10 rounded-xl px-3 py-2 w-fit">
           <Clock className="w-4 h-4 text-primary-foreground/70" />
           <span className="text-sm text-primary-foreground/80">{prison.horarioVisita}</span>
         </div>
+        {(prison.telefone || prison.email) && (
+          <div className="flex gap-3 mt-3">
+            {prison.telefone && (
+              <a href={`tel:${prison.telefone.replace(/\D/g, '')}`} className="flex items-center gap-1.5 bg-primary-foreground/10 rounded-xl px-3 py-2 text-xs text-primary-foreground/80">
+                <Phone className="w-3.5 h-3.5" />
+                {prison.telefone}
+              </a>
+            )}
+            {prison.email && (
+              <a href={`mailto:${prison.email}`} className="flex items-center gap-1.5 bg-primary-foreground/10 rounded-xl px-3 py-2 text-xs text-primary-foreground/80">
+                <Mail className="w-3.5 h-3.5" />
+                E-mail
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}

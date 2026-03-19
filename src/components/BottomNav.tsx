@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { Home, Ticket, PlusCircle, MapPin, User, Bell, Inbox } from 'lucide-react';
+import { Home, Ticket, PlusCircle, MapPin, User, Bell, Inbox, HeartHandshake } from 'lucide-react';
 
 interface BottomNavProps {
-  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile' | 'notifications' | 'requests';
+  active: 'home' | 'bookings' | 'create' | 'trips' | 'profile' | 'notifications' | 'requests' | 'support';
   isDriver?: boolean;
 }
 
@@ -12,6 +12,7 @@ const BottomNav = ({ active, isDriver = false }: BottomNavProps) => {
   const passengerItems = [
     { id: 'home' as const, label: 'Início', icon: Home, path: '/home' },
     { id: 'bookings' as const, label: 'Reservas', icon: Ticket, path: '/my-bookings' },
+    { id: 'support' as const, label: 'Apoio', icon: HeartHandshake, path: '/support' },
     { id: 'notifications' as const, label: 'Avisos', icon: Bell, path: '/notifications?role=passageiro' },
     { id: 'profile' as const, label: 'Perfil', icon: User, path: '/profile?role=passageiro' },
   ];
