@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, FileText, ShieldCheck, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Clock, FileText, ShieldCheck, ExternalLink, Phone, Mail, MapPin } from 'lucide-react';
 import { mockPrisons } from '@/data/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
