@@ -94,8 +94,9 @@ const supportContent: Record<string, {
       { label: 'Defensoria Pública RJ', url: 'https://www.defensoria.rj.def.br' },
     ],
     contacts: [
+      { label: 'Defensoria Pública — Ligue 129', value: '129', type: 'phone' },
       { label: 'TJRJ Central', value: '(21) 3133-3000', type: 'phone' },
-      { label: 'Defensoria Pública', value: '(21) 2332-6000', type: 'phone' },
+      { label: 'Defensoria Pública RJ', value: '(21) 2332-6000', type: 'phone' },
     ],
   },
   mprj: {
