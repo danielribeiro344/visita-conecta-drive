@@ -71,6 +71,28 @@ export interface Booking {
   trip?: Trip;
 }
 
+export type BackpackSize = 'none' | 'small' | 'medium' | 'large';
+export type SuitcaseSize = 'none' | 'small' | 'medium' | 'large';
+
+export interface BaggageInfo {
+  mochila: BackpackSize;
+  mala: SuitcaseSize;
+  sacolas: boolean;
+  sacolasQuantidade?: number;
+  itemEspecial?: string;
+  descricaoAdicional: string;
+}
+
+export type RejectionReason = 
+  | 'Excesso de bagagem'
+  | 'Rota incompatível'
+  | 'Horário incompatível'
+  | 'Veículo sem espaço suficiente'
+  | 'Outro';
+
+export type PenaltyType = 'no_show' | 'bagagem_divergente' | 'atraso' | 'outro';
+export type StrikeLevel = 0 | 1 | 2 | 3;
+
 export interface ChatMessage {
   id: string;
   senderId: string;

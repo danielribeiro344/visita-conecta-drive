@@ -26,15 +26,14 @@ const BookingDetail = () => {
   const maskedPlaca = mockDriverDetail.veiculoPlaca.replace(/(.{3}).(.*)/, '$1-****');
 
   const handleCancel = () => {
-    setStatus('Cancelada');
-    toast.info('Reserva cancelada.');
+    navigate(`/cancel-booking/${booking.id}`);
   };
 
   const timelineSteps = [
     { label: 'Reserva solicitada', done: true, icon: Clock },
     { label: 'Reserva aprovada', done: status === 'Confirmada', icon: Check },
     { label: 'Carona realizada', done: trip.status === 'Finalizada', icon: Flag },
-    { label: 'Avaliação', done: false, icon: Star },
+    { label: 'Avaliação', done: false, icon: Star, action: trip.status === 'Finalizada' ? () => navigate(`/evaluate/${booking.id}?role=passenger`) : undefined },
   ];
 
   return (
@@ -92,17 +91,21 @@ const BookingDetail = () => {
             {timelineSteps.map((step, i) => (
               <div key={i} className="flex items-start gap-3">
                 <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    step.done ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
-                  }`}>
+                  <button
+                    onClick={step.action}
+                    disabled={!step.action}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      step.done ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
+                    } ${step.action ? 'ring-2 ring-primary animate-pulse cursor-pointer' : ''}`}
+                  >
                     <step.icon className="w-4 h-4" />
-                  </div>
+                  </button>
                   {i < timelineSteps.length - 1 && (
                     <div className={`w-0.5 h-6 ${step.done ? 'bg-secondary' : 'bg-border'}`} />
                   )}
                 </div>
-                <p className={`text-sm pt-1.5 ${step.done ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
-                  {step.label}
+                <p className={`text-sm pt-1.5 ${step.done ? 'text-foreground font-medium' : 'text-muted-foreground'} ${step.action ? 'text-primary font-semibold' : ''}`}>
+                  {step.label} {step.action && '→'}
                 </p>
               </div>
             ))}
