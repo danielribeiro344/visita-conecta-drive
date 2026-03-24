@@ -1,17 +1,33 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, MessageCircle, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, MessageCircle, CheckCircle, XCircle, Shield, Package } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { mockBookings } from '@/data/mockData';
 import { toast } from 'sonner';
+import { RejectionReason } from '@/types';
+
+const rejectionReasons: RejectionReason[] = [
+  'Excesso de bagagem',
+  'Rota incompatível',
+  'Horário incompatível',
+  'Veículo sem espaço suficiente',
+  'Outro',
+];
 
 const DriverRequestDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const booking = mockBookings.find(b => b.id === id);
   const [status, setStatus] = useState(booking?.status || 'Pendente');
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState<RejectionReason | ''>('');
+  const [otherReason, setOtherReason] = useState('');
 
   if (!booking) {
     return (
@@ -28,9 +44,25 @@ const DriverRequestDetail = () => {
     toast.success('Reserva aprovada com sucesso!');
   };
 
-  const handleReject = () => {
+  const handleRejectConfirm = () => {
+    if (!selectedReason) return;
+    if (selectedReason === 'Outro' && !otherReason.trim()) return;
+
     setStatus('Cancelada');
-    toast.info('Reserva recusada.');
+    setShowRejectModal(false);
+    const motivo = selectedReason === 'Outro' ? otherReason : selectedReason;
+    toast.info(`Reserva recusada. Motivo: ${motivo}`);
+  };
+
+  const canReject = selectedReason && (selectedReason !== 'Outro' || otherReason.trim().length > 0);
+
+  // Mock baggage data (would come from booking in production)
+  const mockBaggage = {
+    mochila: 'Sim — média (20L a 40L)',
+    mala: 'Não',
+    sacolas: 'Sim (2)',
+    itemEspecial: 'Sacola com alimentos para visita',
+    descricaoAdicional: 'Levo uma mochila média com roupas e 2 sacolas de alimentos permitidos.',
   };
 
   return (
@@ -77,6 +109,21 @@ const DriverRequestDetail = () => {
           </div>
         </div>
 
+        {/* Baggage info */}
+        <div className="bg-card rounded-2xl p-5 shadow-card space-y-3">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" /> Bagagem do Passageiro
+          </h3>
+          <InfoRow label="Mochila" value={mockBaggage.mochila} />
+          <InfoRow label="Mala" value={mockBaggage.mala} />
+          <InfoRow label="Sacolas" value={mockBaggage.sacolas} />
+          {mockBaggage.itemEspecial && <InfoRow label="Item especial" value={mockBaggage.itemEspecial} />}
+          <div className="pt-1">
+            <p className="text-xs text-muted-foreground mb-1">Descrição adicional:</p>
+            <p className="text-sm text-foreground bg-muted rounded-xl p-3">{mockBaggage.descricaoAdicional}</p>
+          </div>
+        </div>
+
         {/* Booking data */}
         <div className="bg-card rounded-2xl p-5 shadow-card space-y-3">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -96,7 +143,7 @@ const DriverRequestDetail = () => {
               <Button onClick={handleApprove} className="flex-1 h-14 rounded-2xl gradient-primary text-primary-foreground font-semibold">
                 <CheckCircle className="w-5 h-5 mr-2" /> Aprovar
               </Button>
-              <Button onClick={handleReject} variant="outline" className="flex-1 h-14 rounded-2xl border-destructive text-destructive font-semibold">
+              <Button onClick={() => setShowRejectModal(true)} variant="outline" className="flex-1 h-14 rounded-2xl border-destructive text-destructive font-semibold">
                 <XCircle className="w-5 h-5 mr-2" /> Recusar
               </Button>
             </div>
@@ -120,6 +167,47 @@ const DriverRequestDetail = () => {
           )}
         </div>
       </motion.div>
+
+      {/* Rejection Modal */}
+      <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
+        <DialogContent className="rounded-2xl mx-4 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Motivo da recusa</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Selecione o motivo para recusar esta reserva. O passageiro será notificado.
+            </DialogDescription>
+          </DialogHeader>
+          <RadioGroup value={selectedReason} onValueChange={(v) => setSelectedReason(v as RejectionReason)}>
+            {rejectionReasons.map((reason) => (
+              <div key={reason} className="flex items-center space-x-3 py-2">
+                <RadioGroupItem value={reason} id={`reason-${reason}`} />
+                <Label htmlFor={`reason-${reason}`} className="text-sm text-foreground cursor-pointer">{reason}</Label>
+              </div>
+            ))}
+          </RadioGroup>
+          {selectedReason === 'Outro' && (
+            <Textarea
+              value={otherReason}
+              onChange={(e) => setOtherReason(e.target.value)}
+              placeholder="Descreva o motivo..."
+              className="rounded-xl resize-none mt-2"
+              rows={3}
+            />
+          )}
+          <div className="flex gap-3 mt-2">
+            <Button variant="outline" onClick={() => setShowRejectModal(false)} className="flex-1 rounded-xl">
+              Voltar
+            </Button>
+            <Button
+              onClick={handleRejectConfirm}
+              disabled={!canReject}
+              className="flex-1 rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              Confirmar recusa
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -128,7 +216,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm text-foreground font-medium">{value}</span>
+      <span className="text-sm text-foreground font-medium text-right max-w-[55%]">{value}</span>
     </div>
   );
 }
