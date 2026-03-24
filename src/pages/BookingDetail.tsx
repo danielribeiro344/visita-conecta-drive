@@ -33,7 +33,7 @@ const BookingDetail = () => {
     { label: 'Reserva solicitada', done: true, icon: Clock },
     { label: 'Reserva aprovada', done: status === 'Confirmada', icon: Check },
     { label: 'Carona realizada', done: trip.status === 'Finalizada', icon: Flag },
-    { label: 'Avaliação', done: false, icon: Star },
+    { label: 'Avaliação', done: false, icon: Star, action: trip.status === 'Finalizada' ? () => navigate(`/evaluate/${booking.id}?role=passenger`) : undefined },
   ];
 
   return (
