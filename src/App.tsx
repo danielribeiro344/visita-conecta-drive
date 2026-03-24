@@ -43,9 +43,11 @@ const App = () => (
             <Route path="/book/:id" element={<BookTrip />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/booking/:id" element={<BookingDetail />} />
+            <Route path="/cancel-booking/:id" element={<CancelBooking />} />
             <Route path="/create-trip" element={<CreateTrip />} />
             <Route path="/my-trips" element={<MyTrips />} />
             <Route path="/trip/:id" element={<TripDetail />} />
+            <Route path="/evaluate/:id" element={<TripEvaluation />} />
             <Route path="/driver-requests" element={<DriverRequests />} />
             <Route path="/driver-request/:id" element={<DriverRequestDetail />} />
             <Route path="/profile" element={<Profile />} />
