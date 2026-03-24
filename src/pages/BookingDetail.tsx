@@ -26,8 +26,7 @@ const BookingDetail = () => {
   const maskedPlaca = mockDriverDetail.veiculoPlaca.replace(/(.{3}).(.*)/, '$1-****');
 
   const handleCancel = () => {
-    setStatus('Cancelada');
-    toast.info('Reserva cancelada.');
+    navigate(`/cancel-booking/${booking.id}`);
   };
 
   const timelineSteps = [
