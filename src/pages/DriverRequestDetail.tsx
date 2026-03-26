@@ -58,11 +58,11 @@ const DriverRequestDetail = () => {
 
   // Mock baggage data (would come from booking in production)
   const mockBaggage = {
-    mochila: 'Sim — média (20L a 40L)',
+    sacola: 'Sim — média',
     mala: 'Não',
-    sacolas: 'Sim (2)',
+    mochilas: 'Sim (2)',
     itemEspecial: 'Sacola com alimentos para visita',
-    descricaoAdicional: 'Levo uma mochila média com roupas e 2 sacolas de alimentos permitidos.',
+    descricaoAdicional: 'Levo 2 mochilas pequenas com roupas e uma sacola plástica com alimentos.',
   };
 
   return (
