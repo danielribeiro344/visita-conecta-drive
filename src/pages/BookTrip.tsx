@@ -47,11 +47,11 @@ const BookTrip = () => {
     navigate('/my-bookings');
   };
 
-  const mochilaLabels: Record<BackpackSize, string> = {
+  const sacolaLabels: Record<SacolaSize, string> = {
     none: 'Não',
-    small: 'Sim — pequena (até 20L)',
-    medium: 'Sim — média (20L a 40L)',
-    large: 'Sim — grande (+40L)',
+    small: 'Sim — pequena',
+    medium: 'Sim — média',
+    large: 'Sim — grande',
   };
 
   const malaLabels: Record<SuitcaseSize, string> = {
