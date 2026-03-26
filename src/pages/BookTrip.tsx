@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { mockTrips } from '@/data/mockData';
 import { toast } from 'sonner';
-import { BaggageInfo, BackpackSize, SuitcaseSize } from '@/types';
+import { BaggageInfo, SacolaSize, SuitcaseSize } from '@/types';
 
 const BookTrip = () => {
   const { id } = useParams();
