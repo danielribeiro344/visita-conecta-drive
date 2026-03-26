@@ -71,14 +71,14 @@ export interface Booking {
   trip?: Trip;
 }
 
-export type BackpackSize = 'none' | 'small' | 'medium' | 'large';
+export type SacolaSize = 'none' | 'small' | 'medium' | 'large';
 export type SuitcaseSize = 'none' | 'small' | 'medium' | 'large';
 
 export interface BaggageInfo {
-  mochila: BackpackSize;
+  sacola: SacolaSize;
   mala: SuitcaseSize;
-  sacolas: boolean;
-  sacolasQuantidade?: number;
+  mochilas: boolean;
+  mochilasQuantidade?: number;
   itemEspecial?: string;
   descricaoAdicional: string;
 }

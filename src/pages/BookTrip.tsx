@@ -215,9 +215,9 @@ const BookTrip = () => {
                 <Package className="w-4 h-4 text-primary" /> Resumo da Bagagem
               </p>
               <div className="space-y-2 text-sm">
-                <SummaryRow label="Mochila" value={mochilaLabels[baggage.mochila]} />
+                <SummaryRow label="Sacola plástica" value={sacolaLabels[baggage.sacola]} />
                 <SummaryRow label="Mala" value={malaLabels[baggage.mala]} />
-                <SummaryRow label="Sacolas" value={baggage.sacolas ? `Sim (${baggage.sacolasQuantidade})` : 'Não'} />
+                <SummaryRow label="Mochilas" value={baggage.mochilas ? `Sim (${baggage.mochilasQuantidade})` : 'Não'} />
                 {baggage.itemEspecial && <SummaryRow label="Item especial" value={baggage.itemEspecial} />}
                 <SummaryRow label="Descrição" value={baggage.descricaoAdicional} />
               </div>

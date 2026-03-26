@@ -114,9 +114,9 @@ const DriverRequestDetail = () => {
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Package className="w-4 h-4 text-primary" /> Bagagem do Passageiro
           </h3>
-          <InfoRow label="Mochila" value={mockBaggage.mochila} />
+          <InfoRow label="Sacola plástica" value={mockBaggage.sacola} />
           <InfoRow label="Mala" value={mockBaggage.mala} />
-          <InfoRow label="Sacolas" value={mockBaggage.sacolas} />
+          <InfoRow label="Mochilas" value={mockBaggage.mochilas} />
           {mockBaggage.itemEspecial && <InfoRow label="Item especial" value={mockBaggage.itemEspecial} />}
           <div className="pt-1">
             <p className="text-xs text-muted-foreground mb-1">Descrição adicional:</p>
