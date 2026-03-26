@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { mockTrips } from '@/data/mockData';
 import { toast } from 'sonner';
-import { BaggageInfo, BackpackSize, SuitcaseSize } from '@/types';
+import { BaggageInfo, SacolaSize, SuitcaseSize } from '@/types';
 
 const BookTrip = () => {
   const { id } = useParams();
@@ -19,10 +19,10 @@ const BookTrip = () => {
   const [step, setStep] = useState<'baggage' | 'confirm'>('baggage');
 
   const [baggage, setBaggage] = useState<BaggageInfo>({
-    mochila: 'none',
+    sacola: 'none',
     mala: 'none',
-    sacolas: false,
-    sacolasQuantidade: 0,
+    mochilas: false,
+    mochilasQuantidade: 0,
     itemEspecial: '',
     descricaoAdicional: '',
   });
@@ -47,11 +47,11 @@ const BookTrip = () => {
     navigate('/my-bookings');
   };
 
-  const mochilaLabels: Record<BackpackSize, string> = {
+  const sacolaLabels: Record<SacolaSize, string> = {
     none: 'Não',
-    small: 'Sim — pequena (até 20L)',
-    medium: 'Sim — média (20L a 40L)',
-    large: 'Sim — grande (+40L)',
+    small: 'Sim — pequena',
+    medium: 'Sim — média',
+    large: 'Sim — grande',
   };
 
   const malaLabels: Record<SuitcaseSize, string> = {
@@ -92,14 +92,14 @@ const BookTrip = () => {
               </p>
             </div>
 
-            {/* Mochila */}
+            {/* Sacola */}
             <div className="bg-card rounded-2xl p-5 shadow-card mb-4">
-              <p className="text-sm font-semibold text-foreground mb-3">🎒 Você está levando mochila?</p>
-              <RadioGroup value={baggage.mochila} onValueChange={(v) => setBaggage({ ...baggage, mochila: v as BackpackSize })}>
-                {(Object.keys(mochilaLabels) as BackpackSize[]).map((key) => (
+              <p className="text-sm font-semibold text-foreground mb-3">🛍️ Você está levando sacola plástica?</p>
+              <RadioGroup value={baggage.sacola} onValueChange={(v) => setBaggage({ ...baggage, sacola: v as SacolaSize })}>
+                {(Object.keys(sacolaLabels) as SacolaSize[]).map((key) => (
                   <div key={key} className="flex items-center space-x-3 py-1.5">
-                    <RadioGroupItem value={key} id={`mochila-${key}`} />
-                    <Label htmlFor={`mochila-${key}`} className="text-sm text-foreground cursor-pointer">{mochilaLabels[key]}</Label>
+                    <RadioGroupItem value={key} id={`sacola-${key}`} />
+                    <Label htmlFor={`sacola-${key}`} className="text-sm text-foreground cursor-pointer">{sacolaLabels[key]}</Label>
                   </div>
                 ))}
               </RadioGroup>
@@ -118,30 +118,37 @@ const BookTrip = () => {
               </RadioGroup>
             </div>
 
-            {/* Sacolas */}
+            {/* Mochilas */}
             <div className="bg-card rounded-2xl p-5 shadow-card mb-4">
-              <p className="text-sm font-semibold text-foreground mb-3">🛍️ Está levando sacolas/itens adicionais?</p>
-              <RadioGroup value={baggage.sacolas ? 'yes' : 'no'} onValueChange={(v) => setBaggage({ ...baggage, sacolas: v === 'yes', sacolasQuantidade: v === 'yes' ? (baggage.sacolasQuantidade || 1) : 0 })}>
+              <p className="text-sm font-semibold text-foreground mb-3">🎒 Está levando mochila?</p>
+              <RadioGroup value={baggage.mochilas ? 'yes' : 'no'} onValueChange={(v) => setBaggage({ ...baggage, mochilas: v === 'yes', mochilasQuantidade: v === 'yes' ? (baggage.mochilasQuantidade || 1) : 0 })}>
                 <div className="flex items-center space-x-3 py-1.5">
-                  <RadioGroupItem value="no" id="sacolas-no" />
-                  <Label htmlFor="sacolas-no" className="text-sm text-foreground cursor-pointer">Não</Label>
+                  <RadioGroupItem value="no" id="mochilas-no" />
+                  <Label htmlFor="mochilas-no" className="text-sm text-foreground cursor-pointer">Não</Label>
                 </div>
                 <div className="flex items-center space-x-3 py-1.5">
-                  <RadioGroupItem value="yes" id="sacolas-yes" />
-                  <Label htmlFor="sacolas-yes" className="text-sm text-foreground cursor-pointer">Sim</Label>
+                  <RadioGroupItem value="yes" id="mochilas-yes" />
+                  <Label htmlFor="mochilas-yes" className="text-sm text-foreground cursor-pointer">Sim</Label>
                 </div>
               </RadioGroup>
-              {baggage.sacolas && (
-                <div className="mt-3 flex items-center gap-3">
-                  <Label className="text-xs text-muted-foreground">Quantidade:</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={baggage.sacolasQuantidade || 1}
-                    onChange={(e) => setBaggage({ ...baggage, sacolasQuantidade: parseInt(e.target.value) || 1 })}
-                    className="w-20 h-9 rounded-xl text-center"
-                  />
+              {baggage.mochilas && (
+                <div className="mt-3 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Label className="text-xs text-muted-foreground">Quantidade:</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={baggage.mochilasQuantidade || 1}
+                      onChange={(e) => setBaggage({ ...baggage, mochilasQuantidade: parseInt(e.target.value) || 1 })}
+                      className="w-20 h-9 rounded-xl text-center"
+                    />
+                  </div>
+                  {(baggage.mochilasQuantidade || 0) > 2 && (
+                    <div className="bg-warning/10 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-warning">⚠️ Atenção: acima de 2 mochilas (até 20L), será cobrado um assento adicional.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -208,9 +215,9 @@ const BookTrip = () => {
                 <Package className="w-4 h-4 text-primary" /> Resumo da Bagagem
               </p>
               <div className="space-y-2 text-sm">
-                <SummaryRow label="Mochila" value={mochilaLabels[baggage.mochila]} />
+                <SummaryRow label="Sacola plástica" value={sacolaLabels[baggage.sacola]} />
                 <SummaryRow label="Mala" value={malaLabels[baggage.mala]} />
-                <SummaryRow label="Sacolas" value={baggage.sacolas ? `Sim (${baggage.sacolasQuantidade})` : 'Não'} />
+                <SummaryRow label="Mochilas" value={baggage.mochilas ? `Sim (${baggage.mochilasQuantidade})` : 'Não'} />
                 {baggage.itemEspecial && <SummaryRow label="Item especial" value={baggage.itemEspecial} />}
                 <SummaryRow label="Descrição" value={baggage.descricaoAdicional} />
               </div>

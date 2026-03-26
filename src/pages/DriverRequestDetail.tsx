@@ -58,11 +58,11 @@ const DriverRequestDetail = () => {
 
   // Mock baggage data (would come from booking in production)
   const mockBaggage = {
-    mochila: 'Sim — média (20L a 40L)',
+    sacola: 'Sim — média',
     mala: 'Não',
-    sacolas: 'Sim (2)',
+    mochilas: 'Sim (2)',
     itemEspecial: 'Sacola com alimentos para visita',
-    descricaoAdicional: 'Levo uma mochila média com roupas e 2 sacolas de alimentos permitidos.',
+    descricaoAdicional: 'Levo 2 mochilas pequenas com roupas e uma sacola plástica com alimentos.',
   };
 
   return (
@@ -114,9 +114,9 @@ const DriverRequestDetail = () => {
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Package className="w-4 h-4 text-primary" /> Bagagem do Passageiro
           </h3>
-          <InfoRow label="Mochila" value={mockBaggage.mochila} />
+          <InfoRow label="Sacola plástica" value={mockBaggage.sacola} />
           <InfoRow label="Mala" value={mockBaggage.mala} />
-          <InfoRow label="Sacolas" value={mockBaggage.sacolas} />
+          <InfoRow label="Mochilas" value={mockBaggage.mochilas} />
           {mockBaggage.itemEspecial && <InfoRow label="Item especial" value={mockBaggage.itemEspecial} />}
           <div className="pt-1">
             <p className="text-xs text-muted-foreground mb-1">Descrição adicional:</p>
