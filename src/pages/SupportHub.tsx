@@ -87,6 +87,26 @@ const SupportHub = () => {
             </div>
           </motion.button>
         ))}
+
+        {/* WhatsApp Suporte */}
+        <motion.a
+          href="https://wa.me/5522998123653"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: services.length * 0.05 }}
+          className="w-full text-left bg-card rounded-2xl p-4 shadow-card hover:shadow-elevated transition-all active:scale-[0.98] flex items-start gap-3 border border-success/20"
+        >
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-success/10 text-success">
+            <MessageCircle className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">Atendimento via WhatsApp</p>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Fale com nossa equipe de suporte pelo WhatsApp (22) 99812-3653</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-success shrink-0 mt-3" />
+        </motion.a>
       </div>
 
       {/* SEAP Contact Units */}
