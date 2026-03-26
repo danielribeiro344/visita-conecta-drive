@@ -92,14 +92,14 @@ const BookTrip = () => {
               </p>
             </div>
 
-            {/* Mochila */}
+            {/* Sacola */}
             <div className="bg-card rounded-2xl p-5 shadow-card mb-4">
-              <p className="text-sm font-semibold text-foreground mb-3">🎒 Você está levando mochila?</p>
-              <RadioGroup value={baggage.mochila} onValueChange={(v) => setBaggage({ ...baggage, mochila: v as BackpackSize })}>
-                {(Object.keys(mochilaLabels) as BackpackSize[]).map((key) => (
+              <p className="text-sm font-semibold text-foreground mb-3">🛍️ Você está levando sacola plástica?</p>
+              <RadioGroup value={baggage.sacola} onValueChange={(v) => setBaggage({ ...baggage, sacola: v as SacolaSize })}>
+                {(Object.keys(sacolaLabels) as SacolaSize[]).map((key) => (
                   <div key={key} className="flex items-center space-x-3 py-1.5">
-                    <RadioGroupItem value={key} id={`mochila-${key}`} />
-                    <Label htmlFor={`mochila-${key}`} className="text-sm text-foreground cursor-pointer">{mochilaLabels[key]}</Label>
+                    <RadioGroupItem value={key} id={`sacola-${key}`} />
+                    <Label htmlFor={`sacola-${key}`} className="text-sm text-foreground cursor-pointer">{sacolaLabels[key]}</Label>
                   </div>
                 ))}
               </RadioGroup>
