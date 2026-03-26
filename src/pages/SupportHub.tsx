@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, FileText, AlertTriangle, Users, HeartPulse, Phone, Mail, ExternalLink, ChevronRight, Building2, Search, Shield } from 'lucide-react';
+import { ArrowLeft, MapPin, FileText, AlertTriangle, Users, HeartPulse, Phone, Mail, ExternalLink, ChevronRight, Building2, Search, Shield, MessageCircle } from 'lucide-react';
 import { seapUnits } from '@/data/mockData';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import BottomNav from '@/components/BottomNav';
