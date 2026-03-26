@@ -118,30 +118,37 @@ const BookTrip = () => {
               </RadioGroup>
             </div>
 
-            {/* Sacolas */}
+            {/* Mochilas */}
             <div className="bg-card rounded-2xl p-5 shadow-card mb-4">
-              <p className="text-sm font-semibold text-foreground mb-3">🛍️ Está levando sacolas/itens adicionais?</p>
-              <RadioGroup value={baggage.sacolas ? 'yes' : 'no'} onValueChange={(v) => setBaggage({ ...baggage, sacolas: v === 'yes', sacolasQuantidade: v === 'yes' ? (baggage.sacolasQuantidade || 1) : 0 })}>
+              <p className="text-sm font-semibold text-foreground mb-3">🎒 Está levando mochila?</p>
+              <RadioGroup value={baggage.mochilas ? 'yes' : 'no'} onValueChange={(v) => setBaggage({ ...baggage, mochilas: v === 'yes', mochilasQuantidade: v === 'yes' ? (baggage.mochilasQuantidade || 1) : 0 })}>
                 <div className="flex items-center space-x-3 py-1.5">
-                  <RadioGroupItem value="no" id="sacolas-no" />
-                  <Label htmlFor="sacolas-no" className="text-sm text-foreground cursor-pointer">Não</Label>
+                  <RadioGroupItem value="no" id="mochilas-no" />
+                  <Label htmlFor="mochilas-no" className="text-sm text-foreground cursor-pointer">Não</Label>
                 </div>
                 <div className="flex items-center space-x-3 py-1.5">
-                  <RadioGroupItem value="yes" id="sacolas-yes" />
-                  <Label htmlFor="sacolas-yes" className="text-sm text-foreground cursor-pointer">Sim</Label>
+                  <RadioGroupItem value="yes" id="mochilas-yes" />
+                  <Label htmlFor="mochilas-yes" className="text-sm text-foreground cursor-pointer">Sim</Label>
                 </div>
               </RadioGroup>
-              {baggage.sacolas && (
-                <div className="mt-3 flex items-center gap-3">
-                  <Label className="text-xs text-muted-foreground">Quantidade:</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={baggage.sacolasQuantidade || 1}
-                    onChange={(e) => setBaggage({ ...baggage, sacolasQuantidade: parseInt(e.target.value) || 1 })}
-                    className="w-20 h-9 rounded-xl text-center"
-                  />
+              {baggage.mochilas && (
+                <div className="mt-3 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Label className="text-xs text-muted-foreground">Quantidade:</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={baggage.mochilasQuantidade || 1}
+                      onChange={(e) => setBaggage({ ...baggage, mochilasQuantidade: parseInt(e.target.value) || 1 })}
+                      className="w-20 h-9 rounded-xl text-center"
+                    />
+                  </div>
+                  {(baggage.mochilasQuantidade || 0) > 2 && (
+                    <div className="bg-warning/10 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-warning">⚠️ Atenção: acima de 2 mochilas (até 20L), será cobrado um assento adicional.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
