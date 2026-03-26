@@ -19,10 +19,10 @@ const BookTrip = () => {
   const [step, setStep] = useState<'baggage' | 'confirm'>('baggage');
 
   const [baggage, setBaggage] = useState<BaggageInfo>({
-    mochila: 'none',
+    sacola: 'none',
     mala: 'none',
-    sacolas: false,
-    sacolasQuantidade: 0,
+    mochilas: false,
+    mochilasQuantidade: 0,
     itemEspecial: '',
     descricaoAdicional: '',
   });
